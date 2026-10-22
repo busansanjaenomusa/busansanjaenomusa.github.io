@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://busansanjaenomusa.github.io/sitemap.xml
