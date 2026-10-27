@@ -11,14 +11,18 @@
 <meta property="og:url" content="https://busansanjaenomusa.github.io/">
 <style>
 *{box-sizing:border-box}
-body{margin:0;background:#f3f6f9;color:#1d2733;font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Malgun Gothic","Noto Sans KR",sans-serif;line-height:1.7;word-break:keep-all}
-.wrap{max-width:760px;margin:0 auto;padding:0 18px 60px}
-header{background:#004e82;color:#fff;padding:46px 18px 40px}
-header .in{max-width:760px;margin:0 auto}
-header small{display:block;opacity:.85;font-size:14px;margin-bottom:6px}
-header h1{margin:0 0 10px;font-size:28px;line-height:1.35}
+body{margin:0;background:linear-gradient(180deg,#0a2a52 0,#dfe9f4 380px,#eaf0f7 100%) fixed;color:#1d2733;font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Malgun Gothic","Noto Sans KR",sans-serif;line-height:1.7;word-break:keep-all}
+.wrap{max-width:760px;margin:0 auto;padding:0 18px 60px;position:relative;margin-top:-18px}
+header{position:relative;overflow:hidden;color:#fff;padding:60px 18px 54px;background:radial-gradient(900px 360px at 85% 0%,rgba(56,189,248,.28),transparent 60%),linear-gradient(135deg,#06152b 0%,#0a2a52 55%,#0e4676 100%)}
+header:before{content:"";position:absolute;inset:0;background-image:linear-gradient(rgba(125,185,255,.09) 1px,transparent 1px),linear-gradient(90deg,rgba(125,185,255,.09) 1px,transparent 1px);background-size:34px 34px;-webkit-mask-image:linear-gradient(90deg,transparent 0%,#000 60%);mask-image:linear-gradient(90deg,transparent 0%,#000 60%)}
+header .in{position:relative;z-index:1;max-width:760px;margin:0 auto}
+header .in>*{max-width:430px}
+.art{position:absolute;right:max(0px,calc(50% - 560px));bottom:0;height:100%;max-height:300px;opacity:.95;z-index:0}
+@media(max-width:700px){.art{opacity:.22;right:-60px}header .in>*{max-width:none}}
+header small{display:inline-block;opacity:.95;font-size:13px;margin-bottom:12px;padding:3px 10px;border:1px solid rgba(125,211,252,.5);border-radius:99px;color:#bde6ff;letter-spacing:.3px}
+header h1{margin:0 0 12px;font-size:32px;line-height:1.3;letter-spacing:-.5px}
 header p{margin:0;font-size:16px;opacity:.95}
-section{background:#fff;border:1px solid #dbe3ea;border-radius:14px;padding:24px 22px;margin-top:18px}
+section{background:#fff;border:1px solid #d3dde8;border-radius:14px;padding:24px 22px;margin-top:18px;box-shadow:0 6px 22px rgba(10,42,82,.08)}
 h2{margin:0 0 12px;font-size:20px;color:#004e82;border-left:5px solid #004e82;padding-left:10px}
 p{margin:0 0 10px}
 ul{margin:0;padding:0;list-style:none}
@@ -46,7 +50,40 @@ li:before{content:"✔";position:absolute;left:0;color:#2e7d32}
 .sub{display:inline-block;margin:4px 10px 0 0;color:#004e82;font-size:14px}
 footer{text-align:center;color:#6a7580;font-size:13px;padding:24px 18px}
 </style></head><body>
-<header><div class="in">
+<header><svg class="art" viewBox="0 0 460 280" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
+<defs>
+<linearGradient id="scr" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#0e2542"/><stop offset="1" stop-color="#0a1830"/></linearGradient>
+<linearGradient id="glow" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#38bdf8" stop-opacity=".35"/><stop offset="1" stop-color="#38bdf8" stop-opacity="0"/></linearGradient>
+</defs>
+<g stroke="#3b82c4" stroke-opacity=".45" fill="none" stroke-width="1.4">
+<path d="M10 220 H90 L120 190 H170"/><path d="M450 90 H400 L380 70 H340"/><path d="M20 120 H70 L90 100"/><path d="M440 200 H380 L360 220 H320"/>
+</g>
+<g fill="#38bdf8" fill-opacity=".8"><circle cx="170" cy="190" r="3"/><circle cx="340" cy="70" r="3"/><circle cx="90" cy="100" r="3"/><circle cx="320" cy="220" r="3"/></g>
+<ellipse cx="235" cy="238" rx="190" ry="22" fill="url(#glow)"/>
+<rect x="115" y="45" width="240" height="150" rx="10" fill="url(#scr)" stroke="#4f9fe0" stroke-width="2"/>
+<circle cx="130" cy="58" r="3" fill="#ff6b6b"/><circle cx="141" cy="58" r="3" fill="#ffd166"/><circle cx="152" cy="58" r="3" fill="#4ade80"/>
+<g stroke-linecap="round" stroke-width="5">
+<path d="M132 82 H178" stroke="#7dd3fc"/><path d="M186 82 H228" stroke="#c4b5fd"/>
+<path d="M146 100 H204" stroke="#86efac"/><path d="M212 100 H262" stroke="#7dd3fc"/>
+<path d="M146 118 H190" stroke="#fcd34d"/><path d="M198 118 H236" stroke="#86efac"/><path d="M244 118 H290" stroke="#c4b5fd"/>
+<path d="M146 136 H214" stroke="#7dd3fc"/><path d="M222 136 H252" stroke="#fcd34d"/>
+<path d="M132 154 H170" stroke="#c4b5fd"/><path d="M178 154 H226" stroke="#86efac"/>
+</g>
+<rect x="298" y="140" width="6" height="14" fill="#38bdf8"/>
+<path d="M95 195 H375 L392 214 Q394 220 388 220 H82 Q76 220 78 214 Z" fill="#1b3a60" stroke="#4f9fe0" stroke-width="1.5"/>
+<rect x="205" y="200" width="60" height="5" rx="2.5" fill="#0a1830"/>
+<g transform="translate(300 16)">
+<rect width="130" height="78" rx="8" fill="#0b1c34" fill-opacity=".92" stroke="#38bdf8" stroke-opacity=".7"/>
+<circle cx="12" cy="12" r="3" fill="#38bdf8"/><circle cx="23" cy="12" r="3" fill="#38bdf8" fill-opacity=".5"/>
+<text x="14" y="42" font-family="Menlo,Consolas,monospace" font-size="15" fill="#7dd3fc">&lt;/&gt;</text>
+<text x="52" y="42" font-family="Menlo,Consolas,monospace" font-size="15" fill="#86efac">{ calc }</text>
+<path d="M14 58 H92" stroke="#4f9fe0" stroke-width="4" stroke-linecap="round" stroke-opacity=".7"/>
+</g>
+<g transform="translate(40 36)" fill="none" stroke="#7dd3fc" stroke-width="3">
+<circle cx="22" cy="22" r="17"/><circle cx="74" cy="22" r="17"/><path d="M39 20 Q48 12 57 20"/><path d="M5 18 L-8 10"/><path d="M91 18 L104 10"/>
+<circle cx="22" cy="22" r="17" fill="#7dd3fc" fill-opacity=".08" stroke="none"/><circle cx="74" cy="22" r="17" fill="#7dd3fc" fill-opacity=".08" stroke="none"/>
+</g>
+</svg><div class="in">
 <small>대신노무법인 송정 · 공인노무사</small>
 <h1>부산산재노무사 신명석</h1>
 <p>일하다 다치신 분, 일한 만큼 받지 못하신 분의 이야기를 20년 동안 들어 왔습니다.</p>
