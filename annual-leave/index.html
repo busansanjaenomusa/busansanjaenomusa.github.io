@@ -1,0 +1,1150 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>연차 발생일수 계산기 (휴직·결근 반영) | 부산산재노무사 신명석</title>
+<meta name="description" content="입사일과 퇴사일, 휴직·결근 기간을 넣으면 근로기준법 제60조에 따라 연차 발생일수를 계산합니다. 1년 계약직, 회계연도 기준 정산, 육아휴직·질병휴직 기간 비례 삭감까지 반영합니다.">
+<meta name="keywords" content="연차 계산기,연차 발생일수,1년 계약직 연차,회계연도 연차,육아휴직 연차,휴직 연차 계산,월차">
+<link rel="canonical" href="https://busansanjaenomusa.github.io/annual-leave/">
+<meta property="og:title" content="연차 발생일수 계산기 (휴직·결근 반영)">
+<meta property="og:description" content="1년 계약직은 15일? 11일? 휴직·결근 기간까지 반영해 연차 발생일수를 계산합니다.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://busansanjaenomusa.github.io/annual-leave/">
+<meta property="og:image" content="https://busansanjaenomusa.github.io/og.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<style>
+  :root {
+    --bg: #f5f5f7;
+    --card: #ffffff;
+    --ink: #1d1d1f;
+    --muted: #6e6e73;
+    --line: #d2d2d7;
+    --line-soft: #e8e8ed;
+    --accent: #0071e3;
+    --accent-hover: #0077ed;
+    --success: #34c759;
+    --warning: #ff9500;
+    --danger: #ff3b30;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text',
+      'Helvetica Neue', 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    letter-spacing: -0.01em;
+  }
+
+  /* ===== 히어로: 부산 스카이라인 ===== */
+  .hero {
+    position: relative;
+    width: 100%;
+    height: 320px;
+    overflow: hidden;
+    background: linear-gradient(180deg, #eef4fa 0%, #f5f5f7 100%);
+  }
+  .hero svg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
+
+  .hero-title {
+    text-align: center;
+    padding: 8px 24px 40px;
+    max-width: 980px;
+    margin: 0 auto;
+  }
+  .hero-title .eyebrow {
+    font-size: 12px;
+    color: var(--muted);
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin: 0 0 10px;
+  }
+  .hero-title h1 {
+    font-size: clamp(38px, 5.5vw, 60px);
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    line-height: 1.05;
+    margin: 0 0 10px;
+    color: var(--ink);
+  }
+  .hero-title p {
+    font-size: 19px;
+    color: var(--muted);
+    margin: 0;
+    font-weight: 400;
+    letter-spacing: -0.01em;
+  }
+
+  .app {
+    max-width: 980px;
+    margin: 0 auto;
+    padding: 0 24px 100px;
+  }
+
+  /* ===== 스티키 결과 바 ===== */
+  .sticky-bar {
+    position: sticky;
+    top: 16px;
+    z-index: 20;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    background: rgba(255,255,255,0.82);
+    backdrop-filter: saturate(180%) blur(20px);
+    -webkit-backdrop-filter: saturate(180%) blur(20px);
+    border: 1px solid var(--line-soft);
+    border-radius: 16px;
+    box-shadow: 0 4px 24px -10px rgba(0,0,0,0.06);
+    padding: 4px;
+    margin-bottom: 28px;
+  }
+  .sticky-bar .item {
+    padding: 14px 12px;
+    text-align: center;
+    position: relative;
+  }
+  .sticky-bar .item:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    right: 0; top: 24%; bottom: 24%;
+    width: 1px;
+    background: var(--line-soft);
+  }
+  .sticky-bar .k {
+    font-size: 11px;
+    color: var(--muted);
+    font-weight: 500;
+    margin-bottom: 4px;
+    letter-spacing: 0;
+  }
+  .sticky-bar .v {
+    font-size: 20px;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    color: var(--ink);
+  }
+  .sticky-bar .item.highlight .v { color: var(--accent); }
+  .sticky-bar .item.warn .v { color: var(--warning); }
+
+  /* ===== 카드 ===== */
+  .card {
+    background: var(--card);
+    border: 1px solid var(--line-soft);
+    border-radius: 18px;
+    padding: 32px;
+    margin-bottom: 16px;
+  }
+  .section-head {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+  .section-head .step {
+    font-size: 13px;
+    color: var(--muted);
+    font-weight: 500;
+    letter-spacing: 0;
+    font-variant-numeric: tabular-nums;
+  }
+  .section-head h2 {
+    font-size: 21px;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    margin: 0;
+  }
+  .section-head .hint {
+    margin-left: auto;
+    font-size: 13px;
+    color: var(--muted);
+    font-weight: 400;
+    letter-spacing: 0;
+  }
+  .note {
+    font-size: 14px;
+    color: var(--muted);
+    line-height: 1.55;
+    margin: 0 0 16px;
+    font-weight: 400;
+    letter-spacing: 0;
+  }
+
+  /* ===== 폼 ===== */
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 14px;
+  }
+  .field { display: flex; flex-direction: column; gap: 6px; }
+  .field label {
+    font-size: 13px;
+    color: var(--muted);
+    font-weight: 500;
+    letter-spacing: 0;
+  }
+  .field input, .field select {
+    padding: 11px 14px;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    font-size: 15px;
+    background: #fff;
+    color: var(--ink);
+    font-family: inherit;
+    letter-spacing: -0.01em;
+    transition: border-color 0.15s, box-shadow 0.15s;
+    -webkit-appearance: none;
+    appearance: none;
+  }
+  .field select {
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236e6e73' stroke-width='2'%3e%3cpath d='M6 9l6 6 6-6'/%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    background-size: 16px;
+    padding-right: 36px;
+  }
+  .field input:focus, .field select:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(0,113,227,0.15);
+  }
+
+  /* ===== 버튼 ===== */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 10px 20px;
+    border: 0;
+    border-radius: 980px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.15s, transform 0.08s;
+    font-family: inherit;
+    letter-spacing: 0;
+  }
+  .btn-primary { background: var(--accent); color: #fff; }
+  .btn-primary:hover { background: var(--accent-hover); }
+  .btn-primary:active { transform: scale(0.98); }
+  .btn-ghost { background: #e8e8ed; color: var(--ink); }
+  .btn-ghost:hover { background: #dcdce1; }
+  .btn-danger {
+    padding: 4px 12px;
+    font-size: 12px;
+    background: transparent;
+    color: var(--danger);
+    border-radius: 8px;
+  }
+  .btn-danger:hover { background: rgba(255,59,48,0.08); }
+  .btn-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; }
+
+  /* ===== 테이블 ===== */
+  .tbl-wrap {
+    overflow-x: auto;
+    border-radius: 12px;
+    border: 1px solid var(--line-soft);
+    background: #fff;
+    margin-bottom: 12px;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+    min-width: 640px;
+  }
+  thead th {
+    padding: 12px 10px;
+    text-align: center;
+    font-weight: 500;
+    font-size: 12px;
+    color: var(--muted);
+    letter-spacing: 0;
+    border-bottom: 1px solid var(--line-soft);
+    background: #fafafa;
+    white-space: nowrap;
+  }
+  tbody td {
+    padding: 10px;
+    text-align: center;
+    border-bottom: 1px solid #f2f2f4;
+    font-size: 13px;
+    color: var(--ink);
+  }
+  tbody tr:last-child td { border-bottom: 0; }
+  tbody td.left { text-align: left; white-space: nowrap; }
+  tbody td b { color: var(--ink); font-weight: 600; font-size: 14px; }
+
+  td input[type="number"], td input[type="date"], td select {
+    width: 84px;
+    padding: 6px 8px;
+    font-size: 13px;
+    text-align: center;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    font-family: inherit;
+    background: #fff;
+    transition: border-color 0.12s;
+    color: var(--ink);
+    -webkit-appearance: none;
+    appearance: none;
+  }
+  td select {
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236e6e73' stroke-width='2'%3e%3cpath d='M6 9l6 6 6-6'/%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 4px center;
+    background-size: 12px;
+    padding-right: 20px;
+    width: 110px;
+  }
+  td input:focus, td select:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(0,113,227,0.12);
+  }
+  td input[type="checkbox"] {
+    width: 18px; height: 18px;
+    accent-color: var(--accent);
+    cursor: pointer;
+  }
+
+  .mcheck-grid {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 4px;
+    min-width: 150px;
+  }
+  .mcheck {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-size: 10px;
+    cursor: pointer;
+    padding: 2px;
+    border-radius: 4px;
+    transition: background 0.1s;
+  }
+  .mcheck:hover { background: #f0f7ff; }
+  .mcheck span { color: var(--muted); font-weight: 500; }
+
+  .badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0;
+  }
+  .badge.deemed   { background: #e8f5e9; color: #2e7d32; }
+  .badge.excluded { background: #ffebee; color: #c62828; }
+  .badge.period   { background: #e3f2fd; color: #1565c0; }
+
+  /* ===== 결과 카드 ===== */
+  .result-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 12px;
+  }
+  .result-card {
+    padding: 24px 16px;
+    border-radius: 14px;
+    background: #fafafa;
+    border: 1px solid var(--line-soft);
+    text-align: center;
+  }
+  .result-card.highlight {
+    background: linear-gradient(180deg, #f0f7ff, #e3efff);
+    border-color: #b3d4ff;
+  }
+  .result-card .k {
+    font-size: 12px;
+    color: var(--muted);
+    font-weight: 500;
+    margin-bottom: 8px;
+    letter-spacing: 0;
+  }
+  .result-card .v {
+    font-size: 28px;
+    font-weight: 600;
+    letter-spacing: -0.03em;
+    line-height: 1;
+    color: var(--ink);
+  }
+  .result-card .v span { font-size: 15px; font-weight: 500; margin-left: 2px; color: var(--muted); }
+  .result-card.highlight .v { color: var(--accent); }
+  .result-card.highlight .v span { color: var(--accent); opacity: 0.7; }
+  .result-card.warn .v { color: var(--warning); }
+  .result-card.danger .v { color: var(--danger); }
+  .result-card .s {
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 8px;
+    font-weight: 400;
+    letter-spacing: 0;
+  }
+
+  footer {
+    text-align: center;
+    color: var(--muted);
+    font-size: 12px;
+    padding: 40px 20px;
+    font-weight: 400;
+    letter-spacing: 0;
+  }
+
+  @media (max-width: 640px) {
+    .hero { height: 260px; }
+    .hero-title { padding: 8px 20px 32px; }
+    .app { padding: 0 16px 80px; }
+    .card { padding: 20px; border-radius: 16px; }
+    .sticky-bar { grid-template-columns: repeat(2, 1fr); top: 8px; }
+    .sticky-bar .item:nth-child(2)::after { display: none; }
+    .sticky-bar .item:nth-child(1),
+    .sticky-bar .item:nth-child(2) {
+      border-bottom: 1px solid var(--line-soft);
+    }
+    .sticky-bar .v { font-size: 17px; }
+    .section-head { flex-wrap: wrap; }
+    .section-head .hint { display: none; }
+    .result-card .v { font-size: 22px; }
+  }
+  @media print {
+    .hero, .hero-title, .sticky-bar, .btn, footer { display: none !important; }
+    .card { border: 1px solid #ccc; page-break-inside: avoid; }
+    body { background: #fff; }
+    .app { padding: 0; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ============ 히어로: 부산 스카이라인 ============ -->
+<header class="hero" aria-hidden="true">
+  <svg viewBox="0 0 1200 320" preserveAspectRatio="xMidYMax slice">
+    <defs>
+      <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%"   stop-color="#e8f0f9"/>
+        <stop offset="100%" stop-color="#f5f5f7"/>
+      </linearGradient>
+      <radialGradient id="sunGlow" cx="0.5" cy="0.5" r="0.5">
+        <stop offset="0%"   stop-color="#fef3c7" stop-opacity="0.7"/>
+        <stop offset="60%"  stop-color="#fef3c7" stop-opacity="0.15"/>
+        <stop offset="100%" stop-color="#fef3c7" stop-opacity="0"/>
+      </radialGradient>
+      <linearGradient id="waterGrad" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%"   stop-color="#dbeafe" stop-opacity="0.55"/>
+        <stop offset="100%" stop-color="#f5f5f7" stop-opacity="0"/>
+      </linearGradient>
+      <linearGradient id="fadeBottom" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%"   stop-color="#f5f5f7" stop-opacity="0"/>
+        <stop offset="100%" stop-color="#f5f5f7" stop-opacity="1"/>
+      </linearGradient>
+    </defs>
+
+    <!-- 하늘 -->
+    <rect width="1200" height="320" fill="url(#sky)"/>
+
+    <!-- 태양 (은은하게) -->
+    <circle cx="600" cy="180" r="160" fill="url(#sunGlow)"/>
+    <circle cx="600" cy="180" r="32" fill="#fef3c7" opacity="0.85"/>
+
+    <!-- 아주 옅은 원경 언덕 -->
+    <path d="M0,220 Q150,195 300,215 T600,210 T900,220 T1200,212 L1200,320 L0,320 Z"
+          fill="#c7d2fe" opacity="0.22"/>
+
+    <!-- 부산타워 (왼쪽) -->
+    <g transform="translate(180, 130)" fill="#7a8899" opacity="0.55">
+      <rect x="-2.5" y="0" width="5" height="90"/>
+      <rect x="-10" y="0" width="20" height="8" rx="1.5"/>
+      <rect x="-6" y="-12" width="12" height="12" rx="1.5"/>
+      <rect x="-1" y="-26" width="2" height="14"/>
+      <circle cx="0" cy="-29" r="2.2" fill="#ef4444" opacity="0.6"/>
+    </g>
+
+    <!-- 광안대교 (중앙) -->
+    <g transform="translate(600, 205)" fill="none" stroke="#7a8899" opacity="0.58" stroke-linecap="round">
+      <!-- 좌측 주탑 -->
+      <rect x="-120" y="-50" width="7" height="60" fill="#7a8899" stroke="none"/>
+      <!-- 우측 주탑 -->
+      <rect x="113" y="-50" width="7" height="60" fill="#7a8899" stroke="none"/>
+      <!-- 메인 케이블 -->
+      <path d="M-116,-50 Q0,-92 116,-50" stroke-width="2.2"/>
+      <!-- 하부 케이블 -->
+      <path d="M-116,-50 Q0,10 116,-50" stroke-width="1.6" opacity="0.7"/>
+      <!-- 사장 케이블 -->
+      <line x1="-116" y1="-42" x2="-140" y2="10" stroke-width="0.9" opacity="0.55"/>
+      <line x1="-116" y1="-28" x2="-150" y2="10" stroke-width="0.9" opacity="0.55"/>
+      <line x1="116"  y1="-42" x2="140"  y2="10" stroke-width="0.9" opacity="0.55"/>
+      <line x1="116"  y1="-28" x2="150"  y2="10" stroke-width="0.9" opacity="0.55"/>
+      <!-- 상판 -->
+      <rect x="-180" y="8" width="360" height="3.5" fill="#7a8899" stroke="none"/>
+    </g>
+
+    <!-- 마린시티 (오른쪽) -->
+    <g transform="translate(950, 165)" fill="#7a8899" opacity="0.55">
+      <rect x="0"   y="30" width="26" height="80"/>
+      <rect x="30"  y="10" width="32" height="100"/>
+      <rect x="66"  y="44" width="22" height="66"/>
+      <rect x="92"  y="-10" width="36" height="120"/>
+      <rect x="132" y="24" width="28" height="86"/>
+      <rect x="164" y="54" width="22" height="56"/>
+      <rect x="190" y="4"  width="32" height="106"/>
+    </g>
+
+    <!-- 수면 -->
+    <rect y="240" width="1200" height="80" fill="url(#waterGrad)"/>
+
+    <!-- 수면 반사 -->
+    <g stroke="#93c5fd" stroke-width="1" opacity="0.35" stroke-linecap="round">
+      <line x1="500" y1="258" x2="700" y2="258"/>
+      <line x1="525" y1="272" x2="675" y2="272"/>
+      <line x1="555" y1="286" x2="645" y2="286"/>
+    </g>
+
+    <!-- 갈매기 -->
+    <g stroke="#7a8899" stroke-width="1.1" fill="none" opacity="0.4" stroke-linecap="round">
+      <path d="M310,105 q6,-6 12,0"/>
+      <path d="M322,105 q6,-6 12,0"/>
+      <path d="M860,80  q5,-5 10,0"/>
+      <path d="M870,80  q5,-5 10,0"/>
+      <path d="M710,60  q4,-4 8,0"/>
+      <path d="M718,60  q4,-4 8,0"/>
+    </g>
+
+    <!-- 하단 페이드 (배경으로) -->
+    <rect y="230" width="1200" height="90" fill="url(#fadeBottom)"/>
+  </svg>
+</header>
+
+<div class="hero-title">
+  <p class="eyebrow">Busan</p>
+  <h1>연차 계산기</h1>
+  <p>입사일·회계연도 기준 비교와 퇴직 정산</p>
+</div>
+
+<div class="app">
+
+  <!-- 스티키 결과 바 -->
+  <div class="sticky-bar" id="stickyBar">
+    <div class="item">
+      <div class="k">입사일 기준</div>
+      <div class="v" id="sbHire">–</div>
+    </div>
+    <div class="item highlight">
+      <div class="k">최종 보장</div>
+      <div class="v" id="sbFinal">–</div>
+    </div>
+    <div class="item" id="sbSettleWrap">
+      <div class="k">퇴직 시 정산</div>
+      <div class="v" id="sbSettle">–</div>
+    </div>
+    <div class="item" id="sbRemainWrap">
+      <div class="k">잔여</div>
+      <div class="v" id="sbRemain">–</div>
+    </div>
+  </div>
+
+  <!-- STEP 1 -->
+  <section class="card">
+    <div class="section-head">
+      <span class="step">01</span>
+      <h2>기본 정보</h2>
+    </div>
+    <div class="grid">
+      <div class="field"><label>입사일</label>
+        <input id="hireDate" type="date" value="2023-03-15" /></div>
+      <div class="field"><label>기준일 (퇴직자는 마지막 근무일)</label>
+        <input id="refDate" type="date" /></div>
+      <div class="field"><label>회계연도 시작 (MM-DD)</label>
+        <input id="fiscalStart" type="text" value="01-01" /></div>
+      <div class="field"><label>산정 방식</label>
+        <select id="basis">
+          <option value="both">입사일 / 회계연도 비교</option>
+          <option value="hire">입사일 기준만</option>
+          <option value="fiscal">회계연도 기준(정산 보장)</option>
+        </select></div>
+      <div class="field"><label>첫해 부분 비례</label>
+        <select id="firstMethod">
+          <option value="daily">일할(재직일수/365)</option>
+          <option value="monthly">월할(재직월수/12)</option>
+          <option value="none">비례 없음</option>
+        </select></div>
+      <div class="field"><label>퇴직연도 부분 (취업규칙에 정한 경우만)</label>
+        <select id="finalMethod">
+          <option value="none">부여 없음(법정)</option>
+          <option value="daily">일할(재직일수/365)</option>
+          <option value="monthly">월할(재직월수/12)</option>
+        </select></div>
+    </div>
+    <p class="note" style="margin:16px 0 0">연차는 1년(월차는 1개월) 근로를 마친 <b>다음 날</b>에도 재직해야 생깁니다(대법원 2021. 10. 14. 선고 2021다227100). 그래서 1년만 근무하고 계약이 끝나면 15일은 생기지 않고 월차 11일만 남습니다. 퇴직자는 기준일에 마지막 근무일을 넣으세요.</p>
+  </section>
+
+  <!-- STEP 2 -->
+  <section class="card">
+    <div class="section-head">
+      <span class="step">02</span>
+      <h2>출근 간주 / 제외 기간</h2>
+      <span class="hint">사유별 자동 분류</span>
+    </div>
+    <p class="note">간주 기간은 출근한 날로 보고, 제외 기간은 소정근로일에서 뺍니다(평일 기준으로 셉니다). 제외 기간이 있어 출근일이 연간 소정근로일의 80%에 못 미치면, 연차를 실질 소정근로일 ÷ 연간 소정근로일 비율로 줄입니다(대법원 2019. 2. 14. 선고 2015다66052). 육아휴직은 2018. 5. 29. 이후 <b>신청</b>한 휴직만 출근 간주합니다(근로기준법 부칙 &lt;제15108호, 2017. 11. 28.&gt; 제2조). 신청일을 비워 두면 시작일로 판단합니다.</p>
+    <div class="btn-row">
+      <button class="btn btn-primary" id="addPeriodBtn">+ 기간 추가</button>
+    </div>
+    <div id="periodTable" class="tbl-wrap"></div>
+  </section>
+
+  <!-- STEP 3 -->
+  <section class="card">
+    <div class="section-head">
+      <span class="step">03</span>
+      <h2>1년 미만 월차</h2>
+      <span class="hint">최대 11일</span>
+    </div>
+    <p class="note">1개월을 개근하고 다음 날에도 재직하면 1일이 생깁니다(최대 11일). 2017. 5. 30. 이후 입사자는 1년이 지나도 이 월차가 15일과 별도로 인정됩니다. 그 전 입사자는 월차가 15일 안에 포함됩니다. 개근하지 못한 달은 체크를 풀어 주세요.</p>
+    <div id="monthlyTable" class="tbl-wrap"></div>
+  </section>
+
+  <!-- STEP 4 -->
+  <section class="card">
+    <div class="section-head">
+      <span class="step">04</span>
+      <h2>입사일 기준 연차 산정</h2>
+      <span class="hint">80% 미만 → 월별 개근</span>
+    </div>
+    <p class="note">연차주기별 소정근로일·실제출근을 입력하세요. 80% 미만 시 개근월 체크박스가 나타납니다.</p>
+    <div id="hireTable" class="tbl-wrap"></div>
+  </section>
+
+  <!-- STEP 5 -->
+  <section class="card">
+    <div class="section-head">
+      <span class="step">05</span>
+      <h2>회계연도 기준 연차 산정</h2>
+      <span class="hint">첫해·퇴직연도 비례</span>
+    </div>
+    <p class="note">회계연도 경계로 나눈 구간입니다. 첫해/퇴직연도 부분은 01 설정을 따릅니다.</p>
+    <div id="fiscalTable" class="tbl-wrap"></div>
+  </section>
+
+  <!-- STEP 6 -->
+  <section class="card">
+    <div class="section-head">
+      <span class="step">06</span>
+      <h2>사용 연차 (일자별)</h2>
+      <span class="hint">자동 귀속 표시</span>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-primary" id="addUsedBtn">+ 사용일 추가</button>
+    </div>
+    <div id="usedTable" class="tbl-wrap"></div>
+  </section>
+
+  <!-- STEP 7 -->
+  <section class="card">
+    <div class="section-head">
+      <span class="step">07</span>
+      <h2>계산 결과</h2>
+    </div>
+    <div id="summary"></div>
+  </section>
+
+  <p class="note" style="text-align:center">잔여 일수는 입사 후 누적 기준입니다. 해마다 소멸되거나 수당으로 정산된 연차는 따로 빼야 합니다. 비례 계산으로 1일 미만이 나오면 시간 단위로 주거나 1일로 올려 주는 것이 안전합니다.</p>
+  <footer>근로기준법 제60조 기준 · 법률 자문 아님 · <a href="/">부산산재노무사 신명석</a></footer>
+</div>
+
+<script>
+/* =====================================================
+   계산 로직 (기존과 동일)
+   ===================================================== */
+const DAY = 86400000;
+const CUTOVER = new Date(2018, 4, 29);
+const $ = (id) => document.getElementById(id);
+const parseDate = (v) => {
+  if (!v) return null;
+  const [y,m,d] = v.split('-').map(Number);
+  return (y && m && d) ? new Date(y, m-1, d) : null;
+};
+const fmt = (d) => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+const addDays = (d,n) => { const x = new Date(d); x.setDate(x.getDate()+n); return x; };
+const addMonths = (d,n) => {
+  const x = new Date(d); const day = x.getDate();
+  x.setDate(1); x.setMonth(x.getMonth()+n);
+  const dim = new Date(x.getFullYear(), x.getMonth()+1, 0).getDate();
+  x.setDate(Math.min(day, dim)); return x;
+};
+const addYears = (d,n) => { const x = new Date(d); x.setFullYear(x.getFullYear()+n); return x; };
+const daysInclusive = (a,b) => Math.max(0, Math.floor((b-a)/DAY)+1);
+const minD = (a,b) => a<b?a:b;
+const maxD = (a,b) => a>b?a:b;
+const fullYearsBetween = (a,b) => {
+  let y = b.getFullYear()-a.getFullYear();
+  if (b.getMonth() < a.getMonth() || (b.getMonth()===a.getMonth() && b.getDate()<a.getDate())) y--;
+  return Math.max(0, y);
+};
+const annualGrant = (svc) => {
+  let base = 15;
+  if (svc >= 3) base += Math.floor((svc-1)/2);
+  return Math.min(base, 25);
+};
+// 평일(월~금) 수 — 소정근로일 기본값과 간주·제외 일수에 사용
+const weekdays = (a,b) => {
+  let n = 0;
+  for (let d = new Date(a); d <= b; d.setDate(d.getDate()+1)) {
+    const w = d.getDay(); if (w !== 0 && w !== 6) n++;
+  }
+  return n;
+};
+const overlapDays = (aS,aE,bS,bE) => {
+  const s = maxD(aS,bS), e = minD(aE,bE);
+  return e >= s ? weekdays(s, e) : 0;
+};
+const REASONS = ['업무상재해','출산전후','육아휴직법정','부당해고','육아휴직약정','질병휴직','쟁의행위','사용자귀책','노조전임'];
+// 부칙 <제15108호> 제2조: 시행일(2018. 5. 29.) 후 최초로 육아휴직을 '신청'하는 근로자부터 출근 간주
+function classifyPeriod(reason, start, end, applied) {
+  const type = (['업무상재해','출산전후','부당해고'].includes(reason) ||
+                (reason === '육아휴직법정' && (applied || start) >= CUTOVER)) ? 'deemed' : 'excluded';
+  return [{ start, end, type }];
+}
+
+const state = { periods: [], usedLeaves: [], monthly: [], hireRows: [], fiscalRows: [] };
+let pidSeq = 0, uidSeq = 0;
+
+function computeDeemedExcluded(row) {
+  let deemed = 0, excluded = 0;
+  state.periods.forEach(p => {
+    if (!p.start || !p.end) return;
+    classifyPeriod(p.reason, p.start, p.end, p.applied).forEach(part => {
+      const ov = overlapDays(part.start, part.end, row.start, row.end);
+      if (ov > 0) (part.type === 'deemed') ? deemed += ov : excluded += ov;
+    });
+  });
+  return { deemed, excluded };
+}
+function attOf(row) {
+  const {deemed, excluded} = computeDeemedExcluded(row);
+  const wd = row.workDays ?? Math.max(1, weekdays(row.start, row.end));
+  const denom = Math.max(0, wd - excluded);
+  const actual = row.actual ?? Math.max(0, wd - excluded - deemed);
+  const num = Math.min(denom, Math.max(0, actual + deemed));
+  const rate = denom > 0 ? (num / denom) * 100 : 0;
+  // 2015다66052: 제외 기간 때문에 출근일이 연간 소정근로일의 80% 미만이면 실질 소정근로일 비율로 비례
+  const ratio = (excluded > 0 && num < wd * 0.8) ? denom / wd : 1;
+  return { rate, wd, actual, deemed, excluded, ratio };
+}
+// 기산일부터 1개월 단위로 나눔(달력 월이 아님)
+function monthsInRow(row) {
+  const months = [];
+  for (let i = 0; ; i++) {
+    const start = addMonths(row.start, i);
+    if (start > row.end) break;
+    const end = minD(addDays(addMonths(row.start, i+1), -1), row.end);
+    months.push({ key: fmt(start), label: `${start.getMonth()+1}/${start.getDate()}`, start, end });
+  }
+  return months;
+}
+function readInputs() {
+  const hire = parseDate($('hireDate').value);
+  const ref = parseDate($('refDate').value) || new Date();
+  return { hire, ref,
+    fiscal: $('fiscalStart').value.trim() || '01-01',
+    basis: $('basis').value,
+    firstMethod: $('firstMethod').value,
+    finalMethod: $('finalMethod').value };
+}
+function buildMonthlyRows(hire, ref) {
+  const rows = [];
+  for (let i = 0; i < 11; i++) {
+    const start = addMonths(hire, i);
+    if (start > ref) break;
+    const end = addDays(addMonths(hire, i+1), -1);
+    const full = end < ref;   // 다음 날에도 재직해야 발생
+    rows.push({ key: fmt(start)+'|'+fmt(end), start, end, full });
+    if (!full) break;
+  }
+  return rows;
+}
+function buildHireRows(hire, ref) {
+  const rows = [];
+  for (let i = 0; ; i++) {
+    const start = addYears(hire, i);
+    if (start > ref) break;
+    const end = addDays(addYears(hire, i+1), -1);
+    if (end >= ref) break;    // 다음 날(부여일)에 재직해야 발생
+    rows.push({ key: fmt(start)+'|'+fmt(end), start, end, grantDate: addDays(end,1) });
+  }
+  return rows;
+}
+function buildFiscalRows(hire, ref, mmdd) {
+  const [m, d] = mmdd.split('-').map(Number);
+  if (!m || !d) return [];
+  const bounds = [];
+  for (let y = hire.getFullYear()-1; y <= ref.getFullYear()+1; y++) bounds.push(new Date(y, m-1, d));
+  bounds.sort((a,b)=>a-b);
+  const rows = [];
+  for (let i = 0; i < bounds.length-1; i++) {
+    const bStart = bounds[i], bEnd = addDays(bounds[i+1], -1);
+    const start = maxD(hire, bStart), end = minD(ref, bEnd);
+    if (start > end) continue;
+    const granted = bEnd < ref;   // 다음 회계연도 첫날에 재직해야 부여
+    const isFull = granted && start.getTime() === bStart.getTime();
+    const isFirstPartial = granted && !isFull;
+    rows.push({ key: fmt(start)+'|'+fmt(end), start, end, isFull, isFirstPartial,
+      label: isFull ? '회계연도' : (isFirstPartial ? '첫해 부분' : '진행 중·퇴직') });
+  }
+  return rows;
+}
+function calcHireRowGrant(row) {
+  const att = attOf(row);
+  const svc = fullYearsBetween(readInputs().hire, addDays(row.end,1));
+  if (att.rate >= 80) return annualGrant(svc) * att.ratio;
+  const checked = Object.values(row.fallbackMonths || {}).filter(Boolean).length;
+  return Math.min(checked, 11);
+}
+const fullMonths = (s, e) => {
+  let n = 0; while (addDays(addMonths(s, n+1), -1) <= e) n++; return n;
+};
+function calcFiscalRowGrant(row, opt) {
+  const att = attOf(row);
+  const svc = fullYearsBetween(opt.hire, addDays(row.end, 1));
+  const base = annualGrant(svc);
+  if (row.isFull) {
+    if (att.rate >= 80) return base * att.ratio;
+    const checked = Object.values(row.fallbackMonths || {}).filter(Boolean).length;
+    return Math.min(checked, 11);
+  }
+  const method = row.isFirstPartial ? opt.firstMethod : opt.finalMethod;
+  if (method === 'none') return 0;
+  if (method === 'daily') return base * daysInclusive(row.start, row.end) / 365;
+  return base * fullMonths(row.start, row.end) / 12;
+}
+// 2017. 5. 30. 전 입사자는 1년차 월차가 15일 안에 포함(구 제60조 제3항)
+const OLD_RULE = new Date(2017, 4, 30);
+function computeTotals(opt) {
+  const monthlyTotal = state.monthly.filter(r => r.full).length;
+  const yearOnePassed = state.hireRows.length > 0;
+  const monthlyAdd = (opt.hire < OLD_RULE && yearOnePassed) ? 0 : monthlyTotal;
+  const hireTotal = monthlyAdd + state.hireRows.reduce((s, r) => s + calcHireRowGrant(r), 0);
+  const fiscalTotal = monthlyAdd + state.fiscalRows.reduce((s, r) => s + calcFiscalRowGrant(r, opt), 0);
+  const finalTotal = opt.basis === 'hire' ? hireTotal : Math.max(hireTotal, fiscalTotal);
+  const settlement = opt.basis === 'hire' ? 0 : Math.max(0, finalTotal - fiscalTotal);
+  const totalUsed = state.usedLeaves.reduce((s, u) => s + (Number(u.days) || 0), 0);
+  return { monthlyTotal, hireTotal, fiscalTotal, finalTotal, settlement, totalUsed,
+           remaining: finalTotal - totalUsed };
+}
+
+/* ---------- 렌더 ---------- */
+function renderPeriods() {
+  let html = `<table><thead><tr><th>사유</th><th>시작일</th><th>종료일</th><th>신청일(육아휴직)</th><th>처리</th><th></th></tr></thead><tbody>`;
+  if (!state.periods.length) {
+    html += `<tr><td colspan="6" style="padding:24px;color:#a1a1a6;font-size:13px">입력된 기간이 없습니다.</td></tr>`;
+  } else {
+    state.periods.forEach(p => {
+      const parts = (p.start && p.end) ? classifyPeriod(p.reason, p.start, p.end, p.applied) : [];
+      const tags = parts.map(x =>
+        `<span class="badge ${x.type}">${x.type==='deemed'?'간주':'제외'} ${fmt(x.start)}~${fmt(x.end)}</span>`
+      ).join(' ');
+      html += `<tr>
+        <td><select data-pid="${p.id}" data-field="reason">
+          ${REASONS.map(r =>
+            `<option ${p.reason===r?'selected':''}>${r}</option>`).join('')}
+        </select></td>
+        <td><input type="date" data-pid="${p.id}" data-field="start" value="${p.start?fmt(p.start):''}"></td>
+        <td><input type="date" data-pid="${p.id}" data-field="end" value="${p.end?fmt(p.end):''}"></td>
+        <td>${p.reason === '육아휴직법정'
+          ? `<input type="date" data-pid="${p.id}" data-field="applied" value="${p.applied?fmt(p.applied):''}">` : '—'}</td>
+        <td class="left">${tags || '—'}</td>
+        <td><button class="btn btn-danger" data-del-period="${p.id}">삭제</button></td>
+      </tr>`;
+    });
+  }
+  $('periodTable').innerHTML = html + `</tbody></table>`;
+}
+function renderMonthly(opt) {
+  if (!state.monthly.length) {
+    $('monthlyTable').innerHTML = `<p class="note" style="margin:0">해당 기간이 없습니다.</p>`;
+    return;
+  }
+  let html = `<table><thead><tr><th>기간</th><th>1개월 개근</th></tr></thead><tbody>`;
+  state.monthly.forEach(r => {
+    html += `<tr><td class="left">${fmt(r.start)} ~ ${fmt(r.end)}</td>
+      <td><input type="checkbox" data-kind="monthly" data-key="${r.key}" data-field="full"
+        ${r.full?'checked':''} ${r.done?'':'disabled'}></td></tr>`;
+  });
+  $('monthlyTable').innerHTML = html + `</tbody></table>`;
+}
+function attendanceRowHtml(kind, row, grant) {
+  const att = attOf(row);
+  const needFallback = att.rate < 80;
+  let fallbackCell = '—';
+  if (needFallback) {
+    const months = monthsInRow(row);
+    fallbackCell = `<div class="mcheck-grid">` + months.map(m =>
+      `<label class="mcheck">
+        <input type="checkbox" data-kind="${kind}" data-key="${row.key}"
+          data-mkey="${m.key}" data-field="fallback"
+          ${row.fallbackMonths?.[m.key]?'checked':''}>
+        <span>${m.label}</span>
+      </label>`).join('') + `</div>`;
+  }
+  const deemedTag   = att.deemed   ? `<span class="badge deemed">${att.deemed}일</span>`   : '0';
+  const excludedTag = att.excluded ? `<span class="badge excluded">${att.excluded}일</span>` : '0';
+  return `<tr>
+    <td class="left">${fmt(row.start)} ~ ${fmt(row.end)}</td>
+    <td><input type="number" min="0" step="1" data-kind="${kind}" data-key="${row.key}"
+      data-field="workDays" value="${row.workDays ?? att.wd}"></td>
+    <td><input type="number" min="0" step="1" data-kind="${kind}" data-key="${row.key}"
+      data-field="actual" value="${row.actual ?? att.actual}"></td>
+    <td>${deemedTag}</td>
+    <td>${excludedTag}</td>
+    <td><b>${att.rate.toFixed(1)}%</b></td>
+    <td class="left">${fallbackCell}</td>
+    <td><b>${grant.toFixed(1)}</b></td>
+  </tr>`;
+}
+function renderHire(opt) {
+  if (!state.hireRows.length) {
+    $('hireTable').innerHTML = `<p class="note" style="margin:0">완료된 입사일 기준 연차주기가 없습니다.</p>`;
+    return;
+  }
+  let html = `<table><thead><tr>
+    <th>연차주기</th><th>소정근로일</th><th>실제출근</th><th>간주</th><th>제외</th>
+    <th>출근율</th><th>80%미만 개근월</th><th>발생</th></tr></thead><tbody>`;
+  state.hireRows.forEach(r => html += attendanceRowHtml('hire', r, calcHireRowGrant(r)));
+  $('hireTable').innerHTML = html + `</tbody></table>`;
+}
+function renderFiscal(opt) {
+  if (!state.fiscalRows.length) {
+    $('fiscalTable').innerHTML = `<p class="note" style="margin:0">회계연도 구간이 없습니다.</p>`;
+    return;
+  }
+  let html = `<table><thead><tr>
+    <th>구분</th><th>기간</th><th>소정근로일</th><th>실제출근</th><th>간주</th><th>제외</th>
+    <th>출근율</th><th>80%미만 개근월</th><th>발생</th></tr></thead><tbody>`;
+  state.fiscalRows.forEach(r => {
+    const att = attOf(r);
+    const needFallback = r.isFull && att.rate < 80;
+    const MN = { daily: '일할 비례', monthly: '월할 비례', none: '부여 없음' };
+    let fallbackCell = r.isFull ? '—' : `<span class="badge period">${MN[r.isFirstPartial ? opt.firstMethod : opt.finalMethod]}</span>`;
+    if (needFallback) {
+      const months = monthsInRow(r);
+      fallbackCell = `<div class="mcheck-grid">` + months.map(m =>
+        `<label class="mcheck">
+          <input type="checkbox" data-kind="fiscal" data-key="${r.key}"
+            data-mkey="${m.key}" data-field="fallback"
+            ${r.fallbackMonths?.[m.key]?'checked':''}>
+          <span>${m.label}</span>
+        </label>`).join('') + `</div>`;
+    }
+    const grant = calcFiscalRowGrant(r, opt);
+    html += `<tr>
+      <td><span class="badge period">${r.label}</span></td>
+      <td class="left">${fmt(r.start)} ~ ${fmt(r.end)}</td>
+      <td><input type="number" min="0" step="1" data-kind="fiscal" data-key="${r.key}"
+        data-field="workDays" value="${r.workDays ?? att.wd}"></td>
+      <td><input type="number" min="0" step="1" data-kind="fiscal" data-key="${r.key}"
+        data-field="actual" value="${r.actual ?? att.actual}"></td>
+      <td>${att.deemed ? `<span class="badge deemed">${att.deemed}일</span>` : '0'}</td>
+      <td>${att.excluded ? `<span class="badge excluded">${att.excluded}일</span>` : '0'}</td>
+      <td><b>${att.rate.toFixed(1)}%</b></td>
+      <td class="left">${fallbackCell}</td>
+      <td><b>${grant.toFixed(1)}</b></td>
+    </tr>`;
+  });
+  $('fiscalTable').innerHTML = html + `</tbody></table>`;
+}
+function attributeUsed(date) {
+  const parts = [];
+  const h = state.hireRows.find(r => date >= r.start && date <= r.end);
+  if (h) parts.push(`입사일 ${fmt(h.start)}~`);
+  const f = state.fiscalRows.find(r => date >= r.start && date <= r.end);
+  if (f) parts.push(`회계 ${fmt(f.start)}~`);
+  return parts.join(' / ') || '—';
+}
+function renderUsed() {
+  let html = `<table><thead><tr><th>사용일</th><th>일수</th><th>귀속 기간</th><th></th></tr></thead><tbody>`;
+  if (!state.usedLeaves.length) {
+    html += `<tr><td colspan="4" style="padding:24px;color:#a1a1a6;font-size:13px">입력된 사용 내역이 없습니다.</td></tr>`;
+  } else {
+    state.usedLeaves.forEach(u => {
+      html += `<tr>
+        <td><input type="date" data-uid="${u.id}" data-field="date" value="${u.date?fmt(u.date):''}"></td>
+        <td><input type="number" min="0" step="0.5" data-uid="${u.id}" data-field="days" value="${u.days}"></td>
+        <td class="left" style="color:#6e6e73;font-size:12px">${u.date ? attributeUsed(u.date) : '—'}</td>
+        <td><button class="btn btn-danger" data-del-used="${u.id}">삭제</button></td>
+      </tr>`;
+    });
+  }
+  $('usedTable').innerHTML = html + `</tbody></table>`;
+}
+function renderSummary(opt, t) {
+  const basisText = opt.basis === 'hire' ? '입사일 기준'
+    : opt.basis === 'fiscal' ? '회계연도 기준'
+    : '입사일 / 회계연도';
+  const settleClass = t.settlement > 0 ? 'warn' : '';
+  const remainClass = t.remaining < 0 ? 'danger' : '';
+  $('summary').innerHTML = `
+    <div class="result-grid">
+      <div class="result-card">
+        <div class="k">1년 미만 월차</div>
+        <div class="v">${t.monthlyTotal}<span>일</span></div>
+        <div class="s">최대 11일${opt.hire < OLD_RULE ? ' · 15일에 포함' : ''}</div>
+      </div>
+      <div class="result-card">
+        <div class="k">입사일 기준</div>
+        <div class="v">${t.hireTotal.toFixed(1)}<span>일</span></div>
+        <div class="s">월차 포함</div>
+      </div>
+      <div class="result-card">
+        <div class="k">회계연도 기준</div>
+        <div class="v">${t.fiscalTotal.toFixed(1)}<span>일</span></div>
+        <div class="s">월차 포함 · 비례 반영</div>
+      </div>
+      <div class="result-card highlight">
+        <div class="k">최종 보장</div>
+        <div class="v">${t.finalTotal.toFixed(1)}<span>일</span></div>
+        <div class="s">${basisText}</div>
+      </div>
+      <div class="result-card ${settleClass}">
+        <div class="k">퇴직 시 정산</div>
+        <div class="v">${t.settlement.toFixed(1)}<span>일</span></div>
+        <div class="s">${t.settlement > 0 ? '차액 보상' : '없음'}</div>
+      </div>
+      <div class="result-card">
+        <div class="k">총 사용</div>
+        <div class="v">${t.totalUsed}<span>일</span></div>
+        <div class="s">일자별 합계</div>
+      </div>
+      <div class="result-card ${remainClass}">
+        <div class="k">잔여(누적)</div>
+        <div class="v">${t.remaining.toFixed(1)}<span>일</span></div>
+        <div class="s">${t.remaining < 0 ? '초과 사용' : '정상'}</div>
+      </div>
+    </div>`;
+
+  $('sbHire').textContent = t.hireTotal.toFixed(1) + '일';
+  $('sbFinal').textContent = t.finalTotal.toFixed(1) + '일';
+  $('sbSettle').textContent = t.settlement.toFixed(1) + '일';
+  $('sbRemain').textContent = t.remaining.toFixed(1) + '일';
+  $('sbSettleWrap').className = 'item ' + (t.settlement > 0 ? 'warn' : '');
+  $('sbRemainWrap').className = 'item ' + (t.remaining < 0 ? 'warn' : '');
+}
+
+function mergeRows(newRows, oldRows) {
+  return newRows.map(nr => {
+    const or = oldRows.find(r => r.key === nr.key);
+    return { ...nr,
+      workDays: or ? or.workDays : null,
+      actual: or ? or.actual : null,
+      fallbackMonths: or ? { ...or.fallbackMonths } : {} };
+  });
+}
+
+function recalc() {
+  const active = document.activeElement;
+  const a = active ? {
+    kind: active.dataset.kind, key: active.dataset.key, field: active.dataset.field,
+    mkey: active.dataset.mkey, pid: active.dataset.pid, uid: active.dataset.uid
+  } : {};
+
+  const opt = readInputs();
+  if (!opt.hire) { $('summary').innerHTML = `<p class="note">입사일을 입력하세요.</p>`; return; }
+  if (opt.ref < opt.hire) { $('summary').innerHTML = `<p class="note" style="color:var(--danger)">기준일이 입사일보다 빠릅니다.</p>`; return; }
+
+  state.monthly = buildMonthlyRows(opt.hire, opt.ref).map(r => {
+    const prev = state.monthly.find(x => x.key === r.key);
+    // 제외 기간(질병휴직 등)이 걸친 달은 개근이 아니므로 기본값을 해제
+    const hit = state.periods.some(p => p.start && p.end &&
+      classifyPeriod(p.reason, p.start, p.end, p.applied).some(x => x.type === 'excluded' && x.start <= r.end && x.end >= r.start));
+    const userOff = prev ? prev.userOff : undefined;   // 사용자가 직접 바꾼 값 우선
+    const off = userOff !== undefined ? userOff : hit;
+    return { ...r, done: r.full, userOff, full: r.full && !off };
+  });
+  state.hireRows   = mergeRows(buildHireRows(opt.hire, opt.ref), state.hireRows);
+  state.fiscalRows = mergeRows(buildFiscalRows(opt.hire, opt.ref, opt.fiscal), state.fiscalRows);
+
+  const totals = computeTotals(opt);
+  renderPeriods(); renderMonthly(opt); renderHire(opt);
+  renderFiscal(opt); renderUsed(); renderSummary(opt, totals);
+
+  let sel = null;
+  if (a.kind && a.key && a.field) {
+    sel = a.mkey
+      ? `[data-kind="${a.kind}"][data-key="${a.key}"][data-mkey="${a.mkey}"][data-field="${a.field}"]`
+      : `[data-kind="${a.kind}"][data-key="${a.key}"][data-field="${a.field}"]`;
+  } else if (a.pid) sel = `[data-pid="${a.pid}"][data-field="${a.field}"]`;
+  else if (a.uid) sel = `[data-uid="${a.uid}"][data-field="${a.field}"]`;
+  if (sel) { const el = document.querySelector(sel); if (el) el.focus(); }
+}
+
+document.addEventListener('change', (e) => {
+  const el = e.target;
+  if (el.dataset.pid) {
+    const p = state.periods.find(x => x.id == el.dataset.pid);
+    if (!p) return;
+    if (el.dataset.field === 'reason') p.reason = el.value;
+    else p[el.dataset.field] = parseDate(el.value);
+    recalc(); return;
+  }
+  if (el.dataset.uid) {
+    const u = state.usedLeaves.find(x => x.id == el.dataset.uid);
+    if (!u) return;
+    if (el.dataset.field === 'date') u.date = parseDate(el.value);
+    else u.days = Number(el.value) || 0;
+    recalc(); return;
+  }
+  if (el.dataset.kind) {
+    if (el.dataset.kind === 'monthly') {
+      const r = state.monthly.find(x => x.key === el.dataset.key);
+      if (r) { r.userOff = !el.checked; r.full = el.checked; }
+      recalc(); return;
+    }
+    const list = el.dataset.kind === 'hire' ? state.hireRows : state.fiscalRows;
+    const r = list.find(x => x.key === el.dataset.key);
+    if (!r) return;
+    if (el.dataset.field === 'fallback') {
+      r.fallbackMonths = { ...r.fallbackMonths, [el.dataset.mkey]: el.checked };
+    } else if (el.dataset.field === 'workDays') {
+      r.workDays = el.value === '' ? null : Number(el.value);
+    } else if (el.dataset.field === 'actual') {
+      r.actual = el.value === '' ? null : Number(el.value);
+    }
+    recalc(); return;
+  }
+  if (['hireDate','refDate','fiscalStart','basis','firstMethod','finalMethod'].includes(el.id)) recalc();
+});
+document.addEventListener('click', (e) => {
+  const t = e.target;
+  if (t.id === 'addPeriodBtn') {
+    state.periods.push({ id: ++pidSeq, reason: '업무상재해', start: null, end: null, applied: null });
+    recalc(); return;
+  }
+  if (t.id === 'addUsedBtn') {
+    state.usedLeaves.push({ id: ++uidSeq, date: null, days: 1 });
+    recalc(); return;
+  }
+  if (t.dataset.delPeriod) {
+    state.periods = state.periods.filter(p => p.id != t.dataset.delPeriod);
+    recalc(); return;
+  }
+  if (t.dataset.delUsed) {
+    state.usedLeaves = state.usedLeaves.filter(u => u.id != t.dataset.delUsed);
+    recalc(); return;
+  }
+});
+
+$('refDate').value = fmt(new Date());
+recalc();
+</script>
+</body>
+</html>
