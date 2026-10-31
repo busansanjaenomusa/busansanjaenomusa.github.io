@@ -189,6 +189,9 @@ nav .logo .ci{width:34px;height:25px}
 .addr .tel{display:flex;width:fit-content;align-items:center;gap:6px;margin:4px 0 12px;padding:9px 16px;border-radius:99px;border:1px solid var(--line);background:var(--card2);font-size:18px;font-weight:800;color:var(--text);text-decoration:none}
 .addr .tel:hover{border-color:var(--accent)}
 .note{display:inline-block;margin-top:16px;padding:8px 14px;border-radius:12px;background:color-mix(in srgb,var(--bg) 85%,transparent);border:1px solid var(--line);color:var(--text);opacity:.85;font-size:14px}
+.sub{margin:44px 0 6px;font-size:clamp(20px,3vw,24px);letter-spacing:-.5px;display:flex;align-items:center;gap:8px}
+.sub:before{content:"";width:18px;height:2px;border-radius:2px;background:linear-gradient(90deg,var(--accent),var(--accent2))}
+.lead.sm{margin-bottom:16px}
 </style></head><body>
 <div id="busanbg"><svg viewBox="0 0 1600 900" preserveAspectRatio="xMidYMax slice" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><defs>
 <linearGradient id="bsky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" class="s1"/><stop offset=".45" class="s2"/><stop offset=".78" class="s3"/><stop offset="1" class="s4"/></linearGradient>
@@ -236,7 +239,7 @@ nav .logo .ci{width:34px;height:25px}
 <section id="calc" class="rv">
 <div class="eyebrow">회원가입 없이 무료</div><h2>무료 계산기·서식 모음</h2>
 <p class="lead">상담에서 자주 하는 계산을 누구나 해 볼 수 있게 만들었습니다. 회원 가입 없이 휴대폰에서 바로 쓰실 수 있습니다. 고용형태별 근로계약서와 퇴사할 때 필요한 사직서 양식도 내려받으실 수 있습니다.</p>
-<div class="chips" id="chips"><button type="button" class="chip on" data-f="전체">전체</button><button type="button" class="chip" data-f="산재·공무원">산재·공무원</button><button type="button" class="chip" data-f="임금·근로">임금·근로</button><button type="button" class="chip" data-f="보험·휴가">보험·휴가</button><button type="button" class="chip" data-f="서식">서식</button></div>
+<div class="chips" id="chips"><button type="button" class="chip on" data-f="전체">전체</button><button type="button" class="chip" data-f="산재·공무원">산재·공무원</button><button type="button" class="chip" data-f="임금·근로">임금·근로</button><button type="button" class="chip" data-f="보험·휴가">보험·휴가</button></div>
 <div class="cards" id="cards">
 <a class="card" id="sanjae" data-cat="산재·공무원" href="https://busansanjaenomusa-01.netlify.app/"><span class="top"><span class="ico k1"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="M9 12h6M12 9v6"/></svg></span><span class="cat">산재·공무원</span><span class="arr" aria-hidden="true">↗</span></span><b>산재 보상금 계산기</b><small>휴업급여와 장해급여 예상액을 계산합니다. 건설 일용직 통상근로계수(0.73)도 자동으로 반영됩니다.</small></a>
 <a class="card" id="gongmuwon" data-cat="산재·공무원" href="https://busansanjaenomusa-gongmuwon.netlify.app/"><span class="top"><span class="ico k1"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 21h18M6 17v-6M10 17v-6M14 17v-6M18 17v-6M12 3l9 5H3z"/></svg></span><span class="cat">산재·공무원</span><span class="arr" aria-hidden="true">↗</span></span><b>공무원 장해급여 계산기</b><small>등급별 장해연금·장해일시금 예상액을 계산하고, 공단 결정 금액을 검산합니다.</small></a>
@@ -249,10 +252,15 @@ nav .logo .ci{width:34px;height:25px}
 <a class="card" id="netpay" data-cat="임금·근로" href="https://busansanjaenomusa.github.io/-Repository/net-pay-calculator.html"><span class="top"><span class="ico k2"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1"/><path d="M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4"/></svg></span><span class="cat">임금·근로</span><span class="arr" aria-hidden="true">↗</span></span><b>월급 실수령액 계산기</b><small>2026년 기준 세전 월급에서 4대보험과 소득세를 근로소득 간이세액표대로 계산해 실수령액을 알려 드립니다. 일용근로자도 계산됩니다.</small></a>
 <a class="card" id="jiyeok" data-cat="보험·휴가" href="https://busansanjaenomusa.github.io/-Repository/jiyeok/"><span class="top"><span class="ico k3"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 10.5 12 3l9 7.5M5 9v12h14V9"/><path d="M12 18s-3-1.8-3-3.7a1.6 1.6 0 0 1 3-.8 1.6 1.6 0 0 1 3 .8c0 1.9-3 3.7-3 3.7z"/></svg></span><span class="cat">보험·휴가</span><span class="arr" aria-hidden="true">↗</span></span><b>지역가입자 건강보험료 계산기</b><small>2026년 기준 소득과 재산으로 지역가입자 월 건강보험료와 장기요양보험료를 계산합니다. 휴대폰에 설치해서 쓸 수 있습니다.</small></a>
 <a class="card" id="parental" data-cat="보험·휴가" href="https://busansanjaenomusa.github.io/-Repository/parental.html"><span class="top"><span class="ico k3"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg></span><span class="cat">보험·휴가</span><em class="new">NEW</em><span class="arr" aria-hidden="true">↗</span></span><b>모성보호 플래너</b><small>출산예정일만 넣으면 출산전후휴가·육아휴직 일정과 신청 기한, 예상 고용보험 급여를 한 번에 계산합니다.</small></a>
+</div>
+<p class="note">※ 계산 결과는 참고용 추정치입니다. 실제 지급액은 근로복지공단·노동청의 판단과 개별 사정에 따라 달라질 수 있습니다.</p>
+
+<h3 class="sub" id="forms">무료 서식</h3>
+<p class="lead sm">실업급여에 맞게 사유를 적는 사직서, 2026년 법령 기준으로 검토한 근로계약서를 한글(HWP) 파일로 받으세요.</p>
+<div class="cards" id="formcards">
 <a class="card" id="resign" data-cat="서식" href="/resign-forms/"><span class="top"><span class="ico k4"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h4"/></svg></span><span class="cat">서식</span><em class="new">NEW</em><span class="arr" aria-hidden="true">↗</span></span><b>사유별 사직서 양식 8종</b><small>권고사직, 개인 사정, 이사, 가족 간병, 계약 만료, 질병, 임금 체불, 육아. 실업급여에 맞게 사유를 적는 한글(HWP) 사직서를 무료로 받으세요.</small></a>
 <a class="card" id="contract" data-cat="서식" href="/contract-forms/"><span class="top"><span class="ico k4"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h4"/></svg></span><span class="cat">서식</span><em class="new">NEW</em><span class="arr" aria-hidden="true">↗</span></span><b>고용형태별 근로계약서 양식 27종</b><small>정규직·연봉·시급·일당·계약직·수습·알바·일용·외국인·경비·미화·병동·프리랜서·임원까지. 2026년 법령 기준으로 검토한 한글 근로계약서를 무료로 받으세요.</small></a>
 </div>
-<p class="note">※ 계산 결과는 참고용 추정치입니다. 실제 지급액은 근로복지공단·노동청의 판단과 개별 사정에 따라 달라질 수 있습니다.</p>
 </section>
 
 <section id="about" class="rv">
@@ -305,7 +313,7 @@ var t=null;try{t=localStorage.getItem('theme')}catch(e){}
 function set(v){d.setAttribute('data-theme',v);var b=document.getElementById('tg');if(b)b.textContent=v==='dark'?'☀':'☾';var m=document.querySelector('meta[name=theme-color]');if(m)m.content=v==='dark'?'#070d1a':'#f3f7fc';try{localStorage.setItem('theme',v)}catch(e){}}
 set(t||'dark');
 document.getElementById('tg').onclick=function(){set(d.getAttribute('data-theme')==='dark'?'light':'dark')};
-var chips=document.querySelectorAll('.chip'),cards=document.querySelectorAll('.card');
+var chips=document.querySelectorAll('.chip'),cards=document.querySelectorAll('#cards .card');
 chips.forEach(function(c){c.onclick=function(){chips.forEach(function(x){x.classList.remove('on')});c.classList.add('on');var f=c.getAttribute('data-f');cards.forEach(function(k){k.classList.toggle('hide',f!=='전체'&&k.getAttribute('data-cat')!==f)})}});
 cards.forEach(function(k){k.addEventListener('pointermove',function(e){var r=k.getBoundingClientRect();k.style.setProperty('--mx',(e.clientX-r.left)+'px');k.style.setProperty('--my',(e.clientY-r.top)+'px')})});
 var rv=document.querySelectorAll('.rv');
