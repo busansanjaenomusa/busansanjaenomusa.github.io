@@ -1,0 +1,547 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>건설일용직 퇴직금 계산기 (계속근로·평균임금) | 부산산재노무사 신명석</title>
+<meta name="description" content="건설일용직(일용근로) 퇴직금을 일 단위 근로내역으로 계산합니다. 계속근로가 끊겼는지와 퇴직 전 3개월 평균임금을 직접 산정하고, 현장 이동과 공수(1.5공)까지 반영합니다.">
+<meta name="keywords" content="건설일용직 퇴직금,일용직 퇴직금 계산기,건설일용근로자 퇴직금,계속근로 단절,일용직 평균임금,공수 계산">
+<link rel="canonical" href="https://busansanjaenomusa.github.io/construction-daily-severance.html">
+<meta property="og:title" content="건설일용직 퇴직금 계산기 (계속근로·평균임금)">
+<meta property="og:description" content="일 단위 근로내역으로 계속근로 단절 여부와 퇴직 전 3개월 평균임금을 산정해 건설일용직 퇴직금을 계산합니다.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://busansanjaenomusa.github.io/construction-daily-severance.html">
+<meta property="og:image" content="https://busansanjaenomusa.github.io/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="건설일용직 퇴직금 계산기 · 부산산재노무사 신명석">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<style>
+:root{
+  --bg:#f6f7f9; --panel:#ffffff; --ink:#1b1f24; --muted:#5d6670; --line:#d9dde3;
+  --accent:#1f5fbf; --accent-ink:#ffffff;
+  --main:#2f8f4e; --main-bg:#dff3e5;      /* 본 현장 */
+  --other:#c9741a; --other-bg:#fbe8d2;    /* 타 현장 */
+  --excl:#6b6fb5; --excl-bg:#e4e5f6;      /* 제외기간 */
+  --win:#d0342c;                          /* 산정기간 */
+  --warn-bg:#fff6dc; --warn-ink:#7a5600; --bad-bg:#fde4e2; --bad-ink:#9b1c14; --ok-bg:#e3f4e8; --ok-ink:#1f6b39;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#121417; --panel:#1b1e23; --ink:#e7eaee; --muted:#9aa3ad; --line:#2f343b;
+    --accent:#5b9bf0; --accent-ink:#0d1117;
+    --main:#5cc27c; --main-bg:#1d3a27; --other:#e79a4a; --other-bg:#40301c; --excl:#a3a7ec; --excl-bg:#2a2b4a;
+    --win:#ff6b62; --warn-bg:#3b3215; --warn-ink:#f0cf73; --bad-bg:#43201d; --bad-ink:#ff9a92; --ok-bg:#1c3826; --ok-ink:#86dca2;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#121417; --panel:#1b1e23; --ink:#e7eaee; --muted:#9aa3ad; --line:#2f343b;
+  --accent:#5b9bf0; --accent-ink:#0d1117;
+  --main:#5cc27c; --main-bg:#1d3a27; --other:#e79a4a; --other-bg:#40301c; --excl:#a3a7ec; --excl-bg:#2a2b4a;
+  --win:#ff6b62; --warn-bg:#3b3215; --warn-ink:#f0cf73; --bad-bg:#43201d; --bad-ink:#ff9a92; --ok-bg:#1c3826; --ok-ink:#86dca2;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Pretendard","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;font-size:15px;line-height:1.55}
+header{padding:20px 16px 8px;max-width:1180px;margin:0 auto}
+h1{font-size:22px;margin:0 0 4px}
+.sub{color:var(--muted);font-size:13.5px;margin:0}
+main{max-width:1180px;margin:0 auto;padding:0 16px 48px}
+section.card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:16px;margin:14px 0}
+h2{font-size:17px;margin:0 0 10px;display:flex;align-items:center;gap:8px}
+h2 .no{display:inline-flex;width:24px;height:24px;border-radius:50%;background:var(--accent);color:var(--accent-ink);font-size:13px;align-items:center;justify-content:center}
+h3{font-size:15px;margin:14px 0 6px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px 14px}
+label{display:block;font-size:13px;color:var(--muted);margin-bottom:3px}
+input[type=text],input[type=date],input[type=number],select{width:100%;padding:7px 9px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--ink);font-size:14px;font-family:inherit}
+input:focus,select:focus{outline:2px solid var(--accent);outline-offset:-1px}
+.hint{font-size:12.5px;color:var(--muted);margin:4px 0 0}
+button{font-family:inherit;font-size:14px;border:1px solid var(--line);background:var(--panel);color:var(--ink);padding:7px 12px;border-radius:6px;cursor:pointer}
+button.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent);font-weight:600}
+button:hover{filter:brightness(.96)}
+.btns{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.tbl-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:8px}
+table{border-collapse:collapse;width:100%;font-size:13.5px}
+th,td{border-bottom:1px solid var(--line);padding:6px 8px;text-align:left;vertical-align:middle;white-space:nowrap}
+th{background:var(--bg);font-weight:600;font-size:12.5px;color:var(--muted)}
+td input[type=text],td input[type=number]{min-width:110px;padding:5px 7px;font-size:13px}
+td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}
+tr.inwin td:first-child{box-shadow:inset 3px 0 0 var(--win)}
+.legend{display:flex;flex-wrap:wrap;gap:12px;font-size:12.5px;color:var(--muted);margin:6px 0 10px}
+.legend i{display:inline-block;width:14px;height:14px;border-radius:3px;vertical-align:-2px;margin-right:4px;border:1px solid var(--line)}
+.cals{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:12px}
+.cal{border:1px solid var(--line);border-radius:8px;padding:8px}
+.cal .ttl{display:flex;justify-content:space-between;font-weight:600;font-size:13.5px;margin-bottom:4px}
+.cal .ttl span{font-weight:400;color:var(--muted);font-size:12px}
+.cal .g{display:grid;grid-template-columns:repeat(7,1fr);gap:2px}
+.cal .dw{font-size:11px;text-align:center;color:var(--muted)}
+.cal .d{font-size:12px;text-align:center;padding:4px 0;border-radius:4px;cursor:pointer;user-select:none;border:1px solid transparent;position:relative;min-height:26px}
+.cal .d.off{visibility:hidden;cursor:default}
+.cal .d.out{opacity:.35}
+.cal .d.s1{background:var(--main-bg);color:var(--main);font-weight:700}
+.cal .d.s2{background:var(--other-bg);color:var(--other);font-weight:700}
+.cal .d.s3{background:var(--excl-bg);color:var(--excl);font-weight:700}
+.cal .d.win{border-color:var(--win)}
+.cal .d.brk{box-shadow:inset 0 -3px 0 var(--win)}
+.cal .d sup{position:absolute;top:0;right:2px;font-size:8.5px;font-weight:400}
+.flag{padding:8px 10px;border-radius:6px;margin:6px 0;font-size:13.5px}
+.flag.warn{background:var(--warn-bg);color:var(--warn-ink)}
+.flag.bad{background:var(--bad-bg);color:var(--bad-ink)}
+.flag.ok{background:var(--ok-bg);color:var(--ok-ink)}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin:10px 0}
+.kpi{border:1px solid var(--line);border-radius:8px;padding:10px 12px}
+.kpi .k{font-size:12.5px;color:var(--muted)}
+.kpi .v{font-size:20px;font-weight:700;font-variant-numeric:tabular-nums}
+.kpi .s{font-size:12px;color:var(--muted)}
+.kpi.main{border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent)}
+tr.sel td{background:color-mix(in srgb,var(--accent) 12%,transparent);font-weight:600}
+details{margin-top:8px}
+summary{cursor:pointer;font-weight:600;font-size:14px}
+.law{font-size:13.5px}
+.law li{margin:4px 0}
+.small{font-size:12.5px;color:var(--muted)}
+.tag{display:inline-block;padding:1px 6px;border-radius:4px;font-size:11.5px;border:1px solid var(--line);color:var(--muted)}
+@media print{
+  body{background:#fff;color:#000}
+  .noprint,.btns,#calSection,#inputSection{display:none!important}
+  section.card{border:1px solid #999;break-inside:avoid}
+}
+</style>
+</head>
+<body>
+<header>
+  <h1>건설일용직 퇴직금 계산기</h1>
+  <p class="sub">일(日) 단위 근로내역으로 ① 계속근로 단절 여부 ② 퇴직 전 3개월(89~92일) 평균임금을 직접 산정합니다. 결과는 검토용 추정치이며 최종 판단은 사실관계·자료에 따라 달라집니다.</p>
+</header>
+<main>
+
+<section class="card" id="basicSection">
+  <h2><span class="no">1</span>기본 정보</h2>
+  <div class="grid">
+    <div><label>근로자 성명</label><input type="text" id="name" placeholder="예) 홍길동"></div>
+    <div><label>현장(사업장)명</label><input type="text" id="site" placeholder="예) ○○건설 ○○현장"></div>
+    <div><label>조회 시작일 (최초 근로일 무렵)</label><input type="date" id="firstDay"></div>
+    <div><label>조회 종료일 (마지막 근로일 무렵)</label><input type="date" id="lastDay"></div>
+  </div>
+  <div class="btns">
+    <button class="primary" id="btnBuild">근로내역 입력표 만들기</button>
+    <button id="btnSample">예시 데이터 불러오기</button>
+    <button id="btnSave">저장(JSON)</button>
+    <button id="btnLoad">불러오기(JSON)</button><input type="file" id="fileLoad" accept=".json,application/json" hidden>
+    <button id="btnPrint">인쇄 / PDF</button>
+    <button id="btnClear">초기화</button>
+  </div>
+  <p class="hint">작업 내용은 이 브라우저에 자동 보관됩니다(다른 기기와 공유되지 않음). 사건별로는 JSON 저장을 권장합니다.</p>
+</section>
+
+<section class="card" id="inputSection" hidden>
+  <h2><span class="no">2</span>월별 근로내역 입력 <span class="tag">고용보험 일용근로내역 기준</span></h2>
+  <p class="small">근로일 입력 형식: <b>1,2,5-9,12</b> (쉼표·범위). 공수가 1이 아닌 날은 <b>13:1.5</b>, <b>20-22:0.5</b>처럼 <b>일:공수</b>로 입력합니다. 달력 칸을 눌러도 수정됩니다(미근로 → 본 현장 → 타 현장 → 제외기간 순환).</p>
+  <div class="tbl-wrap">
+    <table id="monthTable">
+      <thead><tr>
+        <th>연월</th><th>본 현장 근로일 (일:공수)</th><th class="num">일수 / 공수</th>
+        <th>월 보수총액(원)</th><th>일당(원)<br><span style="font-weight:400">근로대장 확인 시</span></th>
+        <th>타 현장 근로일</th><th>제외기간 일자<br><span style="font-weight:400">시행령 제2조</span></th>
+      </tr></thead>
+      <tbody></tbody>
+    </table>
+  </div>
+  <p class="hint">• 월 보수총액: 근로내용확인신고(일용근로내역)상 해당 월 본 현장 보수총액. • 타 현장: 다른 사업장 근로일(고용보험 일용근로내역 상 타 사업장 기록). • 제외기간: 업무상 부상·질병 요양, 사용자 귀책 휴업 등 근로기준법 시행령 제2조 제1항 각 호의 기간.<br>• <span style="color:var(--win)">빨간 표시</span>는 평균임금 산정기간(퇴직 전 3개월)에 걸친 달입니다.</p>
+</section>
+
+<section class="card" id="calSection" hidden>
+  <h2><span class="no">3</span>근로일 달력</h2>
+  <div class="legend">
+    <span><i style="background:var(--main-bg)"></i>본 현장</span>
+    <span><i style="background:var(--other-bg)"></i>타 현장</span>
+    <span><i style="background:var(--excl-bg)"></i>제외기간</span>
+    <span><i style="border:2px solid var(--win)"></i>평균임금 산정기간</span>
+    <span><i style="box-shadow:inset 0 -3px 0 var(--win)"></i>단절 판정 공백</span>
+  </div>
+  <div class="cals" id="cals"></div>
+</section>
+
+<section class="card" id="paramSection">
+  <h2><span class="no">4</span>판단 기준 · 산정 옵션</h2>
+  <h3>가. 계속근로 단절 판단 기준 <span class="tag">실무 기준 · 조정 가능</span></h3>
+  <div class="grid">
+    <div><label>무근로 공백 단절 기준(일)</label><input type="number" id="pGap" min="1" value="30">
+      <p class="hint">본 현장 근로가 없는 역일(제외기간 제외)이 이 일수 이상이면 단절로 봅니다.</p></div>
+    <div><label>타 현장 연속근로 단절 기준(일)</label><input type="number" id="pOther" min="1" value="7">
+      <p class="hint">공백 중 타 현장 근로 구간의 길이(첫날~끝날 역일)가 이 이상이면 단절. 주말·휴일 1~2일은 단절 아님.</p></div>
+    <div><label>타 현장 근로일 연결 허용 간격(일)</label><input type="number" id="pLink" min="0" value="2">
+      <p class="hint">타 현장 근로일 사이 미근로가 이 일수 이하이면 같은 구간으로 이어 봅니다.</p></div>
+    <div><label>월 본 현장 근로일 주의 기준(일)</label><input type="number" id="pMonth" min="0" value="15">
+      <p class="hint">미달 월은 '주의' 표시만 합니다(단절 아님). 판례는 월 4·5일~15일 계속 근무도 계속성 인정(93다26168).</p></div>
+    <div><label>1일 소정근로시간(시간)</label><input type="number" id="pHours" min="1" step="0.5" value="8">
+      <p class="hint">근퇴법 제4조 ① 단서(4주 평균 주 15시간) 점검용.</p></div>
+  </div>
+
+  <h3>나. 평균임금 산정</h3>
+  <div class="grid">
+    <div><label>퇴직일(산정사유 발생일)</label><input type="date" id="retireOverride">
+      <p class="hint">비우면 '마지막 본 현장 근로일 + 1일'로 자동 계산합니다.</p></div>
+    <div><label>산정기간 시작일 직접 지정</label><input type="date" id="winOverride">
+      <p class="hint">비우면 퇴직일의 3개월 전 같은 날(해당일이 없으면 다음 달 1일)부터 자동 계산합니다.</p></div>
+    <div><label>임금 배분 방식(채택안)</label>
+      <select id="pMethod">
+        <option value="days">근로일수 안분 — 월 보수총액 ÷ 월 근로일수 × 기간 내 근로일수</option>
+        <option value="gongsu">공수 안분 — 월 보수총액 ÷ 월 공수 × 기간 내 공수</option>
+        <option value="daily">일당 직접 — 일당 × 기간 내 공수 (근로대장)</option>
+        <option value="calendar">역일 안분(참고) — 월 보수총액 ÷ 월 역일 × 기간 내 역일</option>
+      </select>
+      <p class="hint">네 방식 결과는 아래에 모두 비교 표시됩니다.</p></div>
+    <div><label>산정기간 내 별도 지급 임금(원)</label><input type="number" id="pExtra" min="0" value="0">
+      <p class="hint">월 보수총액에 미포함된 수당 등(기간 내 지급분).</p></div>
+    <div><label>연간 상여금 총액(원)</label><input type="number" id="pBonus" min="0" value="0">
+      <p class="hint">× 3/12 가산.</p></div>
+    <div><label>연차수당(퇴직 전 1년 발생분, 원)</label><input type="number" id="pLeave" min="0" value="0">
+      <p class="hint">× 3/12 가산.</p></div>
+    <div><label>1일 통상임금(원)</label><input type="number" id="pOrdinary" min="0" value="0">
+      <p class="hint">소정근로 1일 대가(일당 중 연장·야간 등 가산분 제외). 0이면 비교 생략.</p></div>
+    <div><label>통상임금 비교 적용</label>
+      <select id="pApplyOrd"><option value="1">적용 (근기법 제2조 제2항)</option><option value="0">미적용(비교만 표시)</option></select></div>
+  </div>
+  <div class="btns"><button class="primary" id="btnCalc">계산하기</button></div>
+</section>
+
+<section class="card" id="resultSection" hidden>
+  <h2><span class="no">5</span>계산 결과</h2>
+  <div id="result"></div>
+</section>
+
+<section class="card">
+  <h2>법적 근거 · 유의사항</h2>
+  <ul class="law">
+    <li><b>퇴직금 지급 요건</b>: 계속근로기간 1년 이상, 4주 평균 1주 소정근로시간 15시간 이상(근로자퇴직급여 보장법 제4조 제1항 단서). 금액은 계속근로기간 1년에 대하여 30일분 이상의 평균임금(같은 법 제8조 제1항).</li>
+    <li><b>평균임금</b>: 산정사유 발생일 이전 3개월 동안 지급된 임금 총액 ÷ 그 기간의 총일수(근로기준법 제2조 제1항 제6호). 3개월의 총일수는 달력에 따라 89~92일이 되므로, 월 단위 보수를 월 역일(n/1)로 나누는 방식은 실제 근로일 분포와 어긋날 수 있습니다. 이 계산기는 일 단위 근로내역으로 산정기간 내 임금을 배분합니다.</li>
+    <li><b>통상임금 보장</b>: 산정된 평균임금이 통상임금보다 적으면 통상임금을 평균임금으로 함(근로기준법 제2조 제2항).</li>
+    <li><b>제외기간</b>: 업무상 부상·질병 요양기간, 사용자 귀책 휴업기간 등은 산정기간과 임금총액에서 각각 뺌(근로기준법 시행령 제2조 제1항).</li>
+    <li><b>일용근로자 평균임금 특례</b>: 근로기준법 시행령 제3조는 "일용근로자의 평균임금은 고용노동부장관이 사업이나 직업에 따라 정하는 금액으로 한다"고 규정합니다. 퇴직금 산정에 적용되는 해당 고시의 존재·내용은 이 계산기에서 확인하지 못했으므로 반영하지 않았고, 원칙 산식(제2조 제1항 제6호)에 따랐습니다. <b>사건 진행 시 별도 확인이 필요합니다.</b></li>
+    <li><b>일용근로자의 계속근로</b>: 형식상 일용직이라도 일용관계가 중단되지 않고 계속되어 온 경우 상용근로자로 보아 그 기간을 계속근로연수로 계산(대법원 1995. 7. 11. 선고 93다26168 전원합의체 판결, 대법원 2002. 7. 26. 선고 2000다27671 판결). 반드시 월 평균 25일 이상 근무하여야 하는 것은 아니며, 1개월에 4·5일 내지 15일 정도 계속 근무하였다면 상근성·계속성·종속성 요건 충족(93다26168).</li>
+    <li><b>단절</b>: 근무의 단절이 상당 기간 지속되어 사회통념상 계속근로로 인정되기 어려운 경우 명시적 퇴직 의사표시가 없더라도 근로관계가 묵시적으로 합의해지된 것으로 봄(대법원 2006. 4. 28. 선고 2004다66995 판결 — 통상 0~4일 공백으로 월 평균 25일 근무하던 중 2개월 보름~4개월의 이례적 공백이 있었던 사안에서 단절 인정).</li>
+    <li><b>단절 판단 기준값</b>(무근로 30일, 타 현장 7일 등)은 법령·판례가 정한 수치가 아니라 실무상 검토 기준을 입력값으로 둔 것입니다. 실제 판단은 공백 사유(현장 사정에 의한 대기인지, 다른 사업주에게 전속하였는지), 재취업 경위, 사용자의 재호출 관행 등을 종합하여 이루어집니다.</li>
+    <li><b>퇴직일</b>: 이 계산기는 마지막 근로일의 다음 날을 퇴직일(산정사유 발생일)로 기본 설정합니다. 근로관계 종료 시점에 다툼이 있으면 직접 입력하십시오.</li>
+    <li>건설근로자공제회 퇴직공제금과 퇴직금의 관계(중복·공제 여부)는 이 계산기에 반영하지 않았습니다. 별도 검토가 필요합니다.</li>
+  </ul>
+</section>
+</main>
+
+<script>
+(() => {
+"use strict";
+const $ = id => document.getElementById(id);
+const DAY = 86400000;
+// ---------- 날짜 유틸 (UTC 일련번호) ----------
+const toN = s => { if(!s) return null; const [y,m,d] = s.split("-").map(Number); return Date.UTC(y,m-1,d)/DAY; };
+const toS = n => new Date(n*DAY).toISOString().slice(0,10);
+const ymd = n => { const d = new Date(n*DAY); return [d.getUTCFullYear(), d.getUTCMonth()+1, d.getUTCDate()]; };
+const dim = (y,m) => new Date(Date.UTC(y,m,0)).getUTCDate();
+const ymKey = (y,m) => y + "-" + String(m).padStart(2,"0");
+const dow = n => new Date(n*DAY).getUTCDay();
+const fmtD = n => { const [y,m,d] = ymd(n); return `${y}. ${m}. ${d}.`; };
+const won = v => isFinite(v) ? Math.round(v).toLocaleString("ko-KR") + "원" : "—";
+const won2 = v => isFinite(v) ? (Math.round(v*100)/100).toLocaleString("ko-KR",{minimumFractionDigits:2,maximumFractionDigits:2}) + "원" : "—";
+const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+function addMonthsBack(n, k){ // n 의 k개월 전 같은 날, 해당일 없으면 다음 달 1일
+  let [y,m,d] = ymd(n); m -= k; while(m<1){ m+=12; y--; }
+  if (d > dim(y,m)) { m++; if(m>12){m=1;y++;} d = 1; }
+  return Date.UTC(y,m-1,d)/DAY;
+}
+function addYears(n, k){ let [y,m,d] = ymd(n); y+=k; if(d>dim(y,m)){ m++; if(m>12){m=1;y++;} d=1; } return Date.UTC(y,m-1,d)/DAY; }
+
+// ---------- 상태 ----------
+// days: { "YYYY-MM-DD": {s:1|2|3, g:공수} }  s=1 본 현장, 2 타 현장, 3 제외기간
+let state = { name:"", site:"", firstDay:"", lastDay:"", days:{}, months:{} };
+const PARAM_IDS = ["pGap","pOther","pLink","pMonth","pHours","retireOverride","winOverride","pMethod","pExtra","pBonus","pLeave","pOrdinary","pApplyOrd"];
+
+function save(){
+  state.name = $("name").value; state.site = $("site").value;
+  state.firstDay = $("firstDay").value; state.lastDay = $("lastDay").value;
+  state.params = {}; PARAM_IDS.forEach(id => state.params[id] = $(id).value);
+  try { localStorage.setItem("cdsev.v1", JSON.stringify(state)); } catch(e) {}
+}
+function applyState(s){
+  state = Object.assign({ days:{}, months:{} }, s);
+  $("name").value = state.name || ""; $("site").value = state.site || "";
+  $("firstDay").value = state.firstDay || ""; $("lastDay").value = state.lastDay || "";
+  if (state.params) PARAM_IDS.forEach(id => { if (state.params[id] !== undefined) $(id).value = state.params[id]; });
+}
+
+// ---------- 월 목록 ----------
+function monthList(){
+  const a = toN(state.firstDay), b = toN(state.lastDay);
+  if (a===null || b===null || b<a) return [];
+  const out = []; let [y,m] = ymd(a); const [ey,em] = ymd(b);
+  while (y<ey || (y===ey && m<=em)) { out.push([y,m]); m++; if(m>12){m=1;y++;} }
+  return out;
+}
+function daysOfMonth(y,m,s){ // 해당 월의 상태 s인 날 [{d,g}]
+  const out = [];
+  for (let d=1; d<=dim(y,m); d++){ const k = ymKey(y,m)+"-"+String(d).padStart(2,"0"); const v = state.days[k]; if (v && v.s===s) out.push({d, g:v.g}); }
+  return out;
+}
+function serialize(list, withG){
+  const parts = []; let i = 0;
+  while (i < list.length){
+    if (withG && list[i].g !== 1){ parts.push(list[i].d + ":" + list[i].g); i++; continue; }
+    let j = i; while (j+1<list.length && list[j+1].d===list[j].d+1 && (!withG || list[j+1].g===1)) j++;
+    parts.push(j>i ? `${list[i].d}-${list[j].d}` : String(list[i].d)); i = j+1;
+  }
+  return parts.join(",");
+}
+function parseDays(txt, y, m){ // "1,2,5-9,12:1.5" → [{d,g}], 오류 목록
+  const res = [], errs = []; const max = dim(y,m);
+  String(txt||"").replace(/\s+/g,"").split(/[,，]/).filter(Boolean).forEach(tok => {
+    const mt = tok.match(/^(\d{1,2})(?:[-~](\d{1,2}))?(?::(\d+(?:\.\d+)?))?$/);
+    if (!mt){ errs.push(tok); return; }
+    const a = +mt[1], b = mt[2] ? +mt[2] : a, g = mt[3] ? +mt[3] : 1;
+    if (a<1 || b>max || b<a || !(g>0)){ errs.push(tok); return; }
+    for (let d=a; d<=b; d++) res.push({d,g});
+  });
+  return {res, errs};
+}
+function setMonthDays(y,m,s,txt){
+  const {res, errs} = parseDays(txt,y,m);
+  for (let d=1; d<=dim(y,m); d++){ const k = ymKey(y,m)+"-"+String(d).padStart(2,"0"); if (state.days[k] && state.days[k].s===s) delete state.days[k]; }
+  res.forEach(({d,g}) => { state.days[ymKey(y,m)+"-"+String(d).padStart(2,"0")] = {s, g: s===1 ? g : 1}; });
+  return errs;
+}
+
+// ---------- 입력표 ----------
+function renderTable(){
+  const tb = $("monthTable").querySelector("tbody"); tb.innerHTML = "";
+  const win = currentWindow();
+  monthList().forEach(([y,m]) => {
+    const key = ymKey(y,m); const mo = state.months[key] || (state.months[key] = {pay:"", daily:""});
+    const main = daysOfMonth(y,m,1), oth = daysOfMonth(y,m,2), exc = daysOfMonth(y,m,3);
+    const gsum = main.reduce((a,x)=>a+x.g,0);
+    const mStart = Date.UTC(y,m-1,1)/DAY, mEnd = Date.UTC(y,m-1,dim(y,m))/DAY;
+    const inwin = win && !(mEnd < win.start || mStart > win.end);
+    const tr = document.createElement("tr"); if (inwin) tr.className = "inwin";
+    tr.innerHTML = `<td><b>${y}. ${m}.</b></td>
+      <td><input type="text" data-k="${key}" data-s="1" value="${esc(serialize(main,true))}" placeholder="예) 1-5,8-12,15:1.5"></td>
+      <td class="num">${main.length}일 / ${gsum}공수</td>
+      <td><input type="number" min="0" data-k="${key}" data-f="pay" value="${esc(mo.pay)}"></td>
+      <td><input type="number" min="0" data-k="${key}" data-f="daily" value="${esc(mo.daily)}"></td>
+      <td><input type="text" data-k="${key}" data-s="2" value="${esc(serialize(oth,false))}"></td>
+      <td><input type="text" data-k="${key}" data-s="3" value="${esc(serialize(exc,false))}"></td>`;
+    tb.appendChild(tr);
+  });
+  $("inputSection").hidden = $("calSection").hidden = monthList().length===0;
+}
+$("monthTable").addEventListener("change", e => {
+  const t = e.target; const k = t.dataset.k; if (!k) return;
+  const [y,m] = k.split("-").map(Number);
+  if (t.dataset.f){ (state.months[k] ||= {pay:"",daily:""})[t.dataset.f] = t.value; save(); return; }
+  const errs = setMonthDays(y,m,+t.dataset.s,t.value);
+  if (errs.length) alert(`${y}년 ${m}월 입력 중 인식하지 못한 항목: ${errs.join(", ")}`);
+  save(); renderTable(); renderCals();
+});
+
+// ---------- 달력 ----------
+let lastAnalysis = null;
+function renderCals(){
+  const box = $("cals"); box.innerHTML = "";
+  const a = toN(state.firstDay), b = toN(state.lastDay); const win = currentWindow();
+  const brkSet = new Set(); if (lastAnalysis) lastAnalysis.gaps.filter(g=>g.broken).forEach(g => { for(let n=g.from;n<=g.to;n++) brkSet.add(n); });
+  monthList().forEach(([y,m]) => {
+    const main = daysOfMonth(y,m,1), oth = daysOfMonth(y,m,2);
+    const div = document.createElement("div"); div.className = "cal";
+    let h = `<div class="ttl">${y}년 ${m}월<span>본 ${main.length}일 · 타 ${oth.length}일</span></div><div class="g">`;
+    "일월화수목금토".split("").forEach(w => h += `<div class="dw">${w}</div>`);
+    const first = Date.UTC(y,m-1,1)/DAY;
+    for (let i=0;i<dow(first);i++) h += `<div class="d off"></div>`;
+    for (let d=1; d<=dim(y,m); d++){
+      const n = first+d-1, k = toS(n), v = state.days[k];
+      const cls = ["d"]; if (v) cls.push("s"+v.s); if (n<a||n>b) cls.push("out");
+      if (win && n>=win.start && n<=win.end) cls.push("win"); if (brkSet.has(n)) cls.push("brk");
+      h += `<div class="${cls.join(" ")}" data-n="${n}">${d}${v && v.s===1 && v.g!==1 ? `<sup>${v.g}</sup>` : ""}</div>`;
+    }
+    div.innerHTML = h + "</div>"; box.appendChild(div);
+  });
+}
+$("cals").addEventListener("click", e => {
+  const el = e.target.closest(".d[data-n]"); if (!el) return;
+  const k = toS(+el.dataset.n); const v = state.days[k]; const next = v ? (v.s+1)%4 : 1;
+  if (next===0) delete state.days[k]; else state.days[k] = {s:next, g:1};
+  save(); renderTable(); renderCals();
+});
+
+// ---------- 산정 ----------
+const P = id => parseFloat($(id).value) || 0;
+function mainDays(){ return Object.keys(state.days).filter(k=>state.days[k].s===1).map(toN).sort((x,y)=>x-y); }
+function currentWindow(){
+  const md = mainDays(); if (!md.length) return null;
+  const retire = toN($("retireOverride").value) ?? (md[md.length-1]+1);
+  const start = toN($("winOverride").value) ?? addMonthsBack(retire,3);
+  return {start, end: retire-1, retire};
+}
+function stateAt(n){ return state.days[toS(n)]?.s || 0; }
+
+function analyzeContinuity(md){
+  const gapLim = P("pGap") || 30, othLim = P("pOther") || 7, link = Math.max(0, P("pLink"));
+  const gaps = [];
+  for (let i=0;i<md.length-1;i++){
+    const from = md[i]+1, to = md[i+1]-1; if (to < from) continue;
+    let noWork = 0; const oth = [];
+    for (let n=from;n<=to;n++){ const s = stateAt(n); if (s!==3) noWork++; if (s===2) oth.push(n); }
+    // 타 현장 구간 묶기
+    const runs = []; oth.forEach(n => { const r = runs[runs.length-1]; if (r && n - r.end - 1 <= link) { r.end = n; r.cnt++; } else runs.push({start:n,end:n,cnt:1}); });
+    const maxRun = runs.reduce((a,r)=> (r.end-r.start+1) > (a? a.end-a.start+1 : 0) ? r : a, null);
+    const runLen = maxRun ? maxRun.end-maxRun.start+1 : 0;
+    const reasons = [];
+    if (noWork >= gapLim) reasons.push(`본 현장 무근로 ${noWork}일(기준 ${gapLim}일 이상)`);
+    if (runLen >= othLim) reasons.push(`타 현장 연속근로 ${fmtD(maxRun.start)}~${fmtD(maxRun.end)} ${runLen}일간(${maxRun.cnt}일 근로, 기준 ${othLim}일 이상)`);
+    if (noWork >= 7 || oth.length) gaps.push({from,to,noWork,othCnt:oth.length,runLen,broken:reasons.length>0,reasons});
+  }
+  return gaps;
+}
+
+function calc(){
+  save();
+  const md = mainDays(); const out = $("result"); $("resultSection").hidden = false;
+  if (!md.length){ out.innerHTML = `<div class="flag bad">본 현장 근로일이 입력되지 않았습니다.</div>`; return; }
+  const warns = [];
+  const gaps = analyzeContinuity(md);
+  const brks = gaps.filter(g=>g.broken);
+  const win = currentWindow(); const retire = win.retire;
+  const lastWork = md[md.length-1];
+  const startCont = brks.length ? md.find(n => n > brks[brks.length-1].to) : md[0];
+  const startAll = md[0];
+  if (toN($("retireOverride").value) !== null && toN($("retireOverride").value) <= lastWork) warns.push("입력한 퇴직일이 마지막 본 현장 근로일 이전입니다. 퇴직일 이후 근로일은 산정에서 제외됩니다.");
+
+  // 월별 근로일수 점검
+  const monthMin = P("pMonth"); const lowMonths = [];
+  monthList().forEach(([y,m]) => {
+    const mS = Date.UTC(y,m-1,1)/DAY, mE = Date.UTC(y,m-1,dim(y,m))/DAY;
+    if (mE < startCont || mS > lastWork) return;
+    const full = mS >= startCont && mE <= lastWork; const c = daysOfMonth(y,m,1).length;
+    if (full && c < monthMin) lowMonths.push(`${y}. ${m}.(${c}일)`);
+  });
+
+  // ---- 평균임금 ----
+  let totalDays = 0, exclDays = 0;
+  for (let n=win.start;n<=win.end;n++){ totalDays++; if (stateAt(n)===3) exclDays++; }
+  const effDays = totalDays - exclDays;
+  const methods = {days:0, gongsu:0, daily:0, calendar:0}; const missing = {daily:false};
+  const rows = [];
+  const [sy,sm] = ymd(win.start), [ey,em] = ymd(win.end);
+  let y=sy, m=sm;
+  while (y<ey || (y===ey && m<=em)){
+    const key = ymKey(y,m); const mo = state.months[key] || {};
+    const pay = parseFloat(mo.pay)||0, daily = parseFloat(mo.daily)||0;
+    const all = daysOfMonth(y,m,1);
+    const mS = Date.UTC(y,m-1,1)/DAY, mE = Date.UTC(y,m-1,dim(y,m))/DAY;
+    const a = Math.max(mS,win.start), b = Math.min(mE,win.end);
+    const inW = all.filter(x => { const n = mS + x.d - 1; return n>=a && n<=b; });
+    const cnt = all.length, g = all.reduce((s,x)=>s+x.g,0), cntIn = inW.length, gIn = inW.reduce((s,x)=>s+x.g,0);
+    let calDays = 0, calIn = 0; for (let n=mS;n<=mE;n++){ if (stateAt(n)!==3){ calDays++; if(n>=a&&n<=b) calIn++; } }
+    const r = { y, m, pay, daily, cnt, g, cntIn, gIn, calIn, calDays, inDays:b-a+1,
+      days: cnt ? pay*cntIn/cnt : 0, gongsu: g ? pay*gIn/g : 0, daily_: daily*gIn, calendar: calDays ? pay*calIn/calDays : 0 };
+    if (cntIn && !pay) warns.push(`${y}. ${m}. 산정기간 내 근로일(${cntIn}일)이 있으나 월 보수총액이 비어 있습니다.`);
+    if (pay && !cnt) warns.push(`${y}. ${m}. 월 보수총액이 있으나 본 현장 근로일이 없습니다.`);
+    if (gIn && !daily) missing.daily = true;
+    methods.days += r.days; methods.gongsu += r.gongsu; methods.daily += r.daily_; methods.calendar += r.calendar;
+    rows.push(r); m++; if(m>12){m=1;y++;}
+  }
+  const add = P("pExtra") + P("pBonus")*3/12 + P("pLeave")*3/12;
+  const ordinary = P("pOrdinary"); const applyOrd = $("pApplyOrd").value === "1";
+  const sel = $("pMethod").value;
+  const daysCont = retire - startCont, daysAll = retire - startAll;
+  const res = {};
+  Object.keys(methods).forEach(k => {
+    const wage = methods[k] + add; const avg = effDays ? wage/effDays : NaN;
+    const used = (applyOrd && ordinary > avg) ? ordinary : avg;
+    res[k] = { wage, avg, used, ordUsed: applyOrd && ordinary > avg, sev: used*30*daysCont/365, sevAll: used*30*daysAll/365 };
+  });
+  const R = res[sel];
+
+  // 요건
+  const oneYear = retire >= addYears(startCont,1);
+  const mdCont = md.filter(n=>n>=startCont);
+  const weeks = daysCont/7; const weeklyH = weeks ? mdCont.length/weeks*P("pHours") : 0;
+
+  // ---- 출력 ----
+  const names = {days:"근로일수 안분", gongsu:"공수 안분", daily:"일당 직접", calendar:"역일 안분(참고)"};
+  let h = "";
+  h += `<div class="small">${esc(state.name)||"(성명 미입력)"} · ${esc(state.site)||"(현장 미입력)"} · 산정일 ${new Date().toLocaleDateString("ko-KR")}</div>`;
+  const elig = oneYear && weeklyH >= 15;
+  h += `<div class="flag ${elig ? "ok" : "bad"}">${elig ? "퇴직금 지급요건 충족(추정)" : "퇴직금 지급요건 미충족 가능성"} — 계속근로 ${daysCont}일(${oneYear ? "1년 이상" : "1년 미만"}), 4주 평균 주 소정근로시간 약 ${weeklyH.toFixed(1)}시간(${weeklyH>=15 ? "15시간 이상" : "15시간 미만"})</div>`;
+  h += `<div class="kpis">
+    <div class="kpi main"><div class="k">예상 퇴직금 (${names[sel]})</div><div class="v">${won(R.sev)}</div><div class="s">${R.ordUsed ? "통상임금 적용" : "평균임금 적용"} · 1일 ${won2(R.used)} × 30일 × ${daysCont}/365</div></div>
+    <div class="kpi"><div class="k">계속근로기간</div><div class="v">${daysCont.toLocaleString()}일</div><div class="s">${fmtD(startCont)} ~ ${fmtD(retire-1)} (약 ${(daysCont/365).toFixed(2)}년)</div></div>
+    <div class="kpi"><div class="k">평균임금 산정기간</div><div class="v">${totalDays}일${exclDays ? ` <span class="small">(제외 ${exclDays}일 → ${effDays}일)</span>` : ""}</div><div class="s">${fmtD(win.start)} ~ ${fmtD(win.end)}</div></div>
+    <div class="kpi"><div class="k">1일 평균임금</div><div class="v">${won2(R.avg)}</div><div class="s">임금총액 ${won(R.wage)} ÷ ${effDays}일</div></div>
+  </div>`;
+
+  // 계속근로 판정
+  h += `<h3>① 계속근로 판정</h3>`;
+  if (!brks.length) h += `<div class="flag ok">설정 기준상 단절 사유가 발견되지 않았습니다. 기산일: ${fmtD(startCont)} (최초 본 현장 근로일)</div>`;
+  else h += `<div class="flag bad">단절 ${brks.length}건 발견 — 마지막 단절 이후 최초 근로일 <b>${fmtD(startCont)}</b>부터 계속근로 기산.</div>`;
+  if (lowMonths.length) h += `<div class="flag warn">월 본 현장 근로일 ${monthMin}일 미만 월: ${lowMonths.join(", ")} — 단절 사유는 아니나 계속성 다툼 소지 검토(93다26168: 월 4·5일~15일도 계속성 인정).</div>`;
+  if (gaps.length){
+    h += `<div class="tbl-wrap"><table><thead><tr><th>공백 기간</th><th class="num">무근로 역일</th><th class="num">타 현장 근로일</th><th class="num">타 현장 최장 구간</th><th>판정</th></tr></thead><tbody>`;
+    gaps.forEach(g => h += `<tr><td>${fmtD(g.from)} ~ ${fmtD(g.to)}</td><td class="num">${g.noWork}일</td><td class="num">${g.othCnt}일</td><td class="num">${g.runLen}일</td><td style="white-space:normal">${g.broken ? `<b style="color:var(--bad-ink)">단절</b> — ${g.reasons.join(" / ")}` : (g.othCnt ? "유지 (단기 타 현장)" : "유지 (주의: 7일 이상 공백)")}</td></tr>`);
+    h += `</tbody></table></div><p class="hint">7일 이상 공백 또는 타 현장 근로가 포함된 공백만 표시합니다.</p>`;
+  }
+
+  // 평균임금 산정표
+  h += `<h3>② 평균임금 산정표 (산정기간 ${fmtD(win.start)} ~ ${fmtD(win.end)}, ${totalDays}일)</h3>`;
+  h += `<div class="tbl-wrap"><table><thead><tr><th>연월</th><th class="num">월 보수총액</th><th class="num">월 근로일/공수</th><th class="num">기간 내 근로일/공수</th><th class="num">기간 내 역일</th><th class="num">근로일수 안분</th><th class="num">공수 안분</th><th class="num">일당 직접</th><th class="num">역일 안분</th></tr></thead><tbody>`;
+  rows.forEach(r => h += `<tr><td>${r.y}. ${r.m}.</td><td class="num">${won(r.pay)}</td><td class="num">${r.cnt}일/${r.g}</td><td class="num">${r.cntIn}일/${r.gIn}</td><td class="num">${r.inDays}일</td><td class="num">${won(r.days)}</td><td class="num">${won(r.gongsu)}</td><td class="num">${r.daily ? won(r.daily_) : "일당 미입력"}</td><td class="num">${won(r.calendar)}</td></tr>`);
+  h += `<tr><td>가산임금</td><td colspan="4" class="small">별도 ${won(P("pExtra"))} + 상여 ${won(P("pBonus"))}×3/12 + 연차 ${won(P("pLeave"))}×3/12</td>${Object.keys(methods).map(()=>`<td class="num">${won(add)}</td>`).join("")}</tr>`;
+  h += `</tbody></table></div>`;
+
+  // 방식별 비교
+  h += `<h3>③ 산정방식별 비교</h3><div class="tbl-wrap"><table><thead><tr><th>방식</th><th class="num">임금총액</th><th class="num">1일 평균임금</th><th class="num">적용 일급</th><th class="num">퇴직금 (단절 반영)</th><th class="num">퇴직금 (단절 미반영)</th></tr></thead><tbody>`;
+  Object.keys(res).forEach(k => { const x = res[k]; const na = k==="daily" && missing.daily;
+    h += `<tr class="${k===sel?"sel":""}"><td>${names[k]}${k===sel?" ✔":""}${na?' <span class="tag">일당 일부 미입력</span>':""}</td><td class="num">${won(x.wage)}</td><td class="num">${won2(x.avg)}</td><td class="num">${won2(x.used)}${x.ordUsed?' <span class="tag">통상</span>':""}</td><td class="num">${won(x.sev)}</td><td class="num">${won(x.sevAll)}</td></tr>`; });
+  h += `</tbody></table></div>`;
+  const vals = ["days","gongsu"].concat(missing.daily ? [] : ["daily"]).map(k=>res[k].sev);
+  h += `<p class="hint">• 근로일 기반 방식(근로일수·공수${missing.daily?"":"·일당"}) 간 퇴직금 범위: ${won(Math.min(...vals))} ~ ${won(Math.max(...vals))}. 역일 안분은 월 보수를 달력일로 나누는 단순 방식으로, 실제 근로일 분포를 반영하지 못하므로 비교용으로만 표시합니다.<br>• 단절 미반영: 최초 본 현장 근로일 ${fmtD(startAll)}부터 ${daysAll}일로 계산(단절 다툼 시 주장 가능 최대치 참고).</p>`;
+  if (ordinary) h += `<p class="hint">• 1일 통상임금 ${won(ordinary)}${applyOrd ? "을 평균임금과 비교하여 높은 금액 적용(근로기준법 제2조 제2항)" : "— 비교만 하고 적용하지 않음"}.</p>`;
+  if (warns.length) h += `<h3>④ 자료 점검</h3>` + warns.map(w=>`<div class="flag warn">${esc(w)}</div>`).join("");
+  out.innerHTML = h;
+  lastAnalysis = {gaps};
+  renderTable(); renderCals();
+  $("resultSection").scrollIntoView({behavior:"smooth"});
+}
+
+// ---------- 예시 데이터 ----------
+function sample(){
+  const s = { name:"홍길동(예시)", site:"○○건설 ○○신축현장", firstDay:"2024-08-01", lastDay:"2026-09-30", days:{}, months:{} };
+  const a = toN("2024-08-05"), b = toN("2026-09-25");
+  for (let n=a;n<=b;n++){
+    const w = dow(n); const k = toS(n);
+    if (n>=toN("2025-02-17") && n<=toN("2025-02-28")) { if (w!==0) s.days[k] = {s:2,g:1}; continue; } // 타 현장 2주 → 단절 예시
+    if (n>=toN("2025-08-04") && n<=toN("2025-08-08")) continue;                                       // 현장 대기 5일
+    if (w===0) { if (n%23===0) s.days[k] = {s:2,g:1}; continue; }                                       // 간헐적 일요일 타 현장
+    if (w===6 && n%3!==0) continue;
+    s.days[k] = {s:1, g: (n%17===0 ? 1.5 : 1)};
+  }
+  Object.keys(s.days).forEach(k => { if (s.days[k].s!==1) return; const mk = k.slice(0,7); const mo = s.months[mk] ||= {pay:0, daily:"230000"}; mo.pay += 230000*s.days[k].g; });
+  Object.values(s.months).forEach(mo => mo.pay = String(mo.pay));
+  s.params = { pOrdinary:"0" };
+  return s;
+}
+
+// ---------- 이벤트 ----------
+$("btnBuild").onclick = () => { save(); if (!monthList().length) { alert("조회 시작일과 종료일을 입력하세요."); return; } renderTable(); renderCals(); };
+$("btnSample").onclick = () => { applyState(sample()); save(); renderTable(); renderCals(); calc(); };
+$("btnCalc").onclick = calc;
+$("btnPrint").onclick = () => window.print();
+$("btnClear").onclick = () => { if (!confirm("입력 내용을 모두 지울까요?")) return; try{ localStorage.removeItem("cdsev.v1"); }catch(e){} location.reload(); };
+$("btnSave").onclick = () => { save(); const blob = new Blob([JSON.stringify(state,null,1)],{type:"application/json"}); const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = `퇴직금산정_${state.name||"근로자"}.json`; a.click(); URL.revokeObjectURL(a.href); };
+$("btnLoad").onclick = () => $("fileLoad").click();
+$("fileLoad").onchange = e => { const f = e.target.files[0]; if (!f) return; f.text().then(t => { try { applyState(JSON.parse(t)); save(); renderTable(); renderCals(); } catch(err){ alert("파일을 읽지 못했습니다."); } }); };
+["name","site","firstDay","lastDay"].concat(PARAM_IDS).forEach(id => $(id).addEventListener("change", () => { save(); if (id==="retireOverride"||id==="winOverride"){ renderTable(); renderCals(); } }));
+
+try { const saved = localStorage.getItem("cdsev.v1"); if (saved) { applyState(JSON.parse(saved)); renderTable(); renderCals(); } } catch(e) {}
+})();
+</script>
+</body>
+</html>
